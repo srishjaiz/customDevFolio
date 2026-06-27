@@ -388,18 +388,166 @@ pub fn sanitize_project_name(raw: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::str::FromStr;
 
     #[test]
     fn sanitize_names() {
         assert_eq!(sanitize_project_name("My Portfolio"), "my-portfolio");
         assert_eq!(sanitize_project_name("  "), "my-portfolio");
         assert_eq!(sanitize_project_name("Ada_Lovelace"), "ada-lovelace");
+        assert_eq!(sanitize_project_name("---"), "my-portfolio");
+        assert_eq!(sanitize_project_name("Foo!!!Bar"), "foo-bar");
+        assert_eq!(sanitize_project_name("a__b"), "a--b");
+        assert_eq!(sanitize_project_name("Already-Ok"), "already-ok");
+        assert_eq!(sanitize_project_name("  spaced  name  "), "spaced-name");
     }
 
     #[test]
     fn domain_roundtrip() {
         for d in DomainId::ALL {
             assert_eq!(DomainId::parse(d.as_str()), Some(d));
+            assert_eq!(d.to_string(), d.as_str());
+            assert_eq!(DomainId::from_str(d.as_str()).unwrap(), d);
         }
+        assert_eq!(DomainId::ALL.len(), 10);
+    }
+
+    #[test]
+    fn domain_aliases() {
+        assert_eq!(DomainId::parse("fe"), Some(DomainId::Frontend));
+        assert_eq!(DomainId::parse("BE"), Some(DomainId::Backend));
+        assert_eq!(DomainId::parse("full-stack"), Some(DomainId::Fullstack));
+        assert_eq!(DomainId::parse("full_stack"), Some(DomainId::Fullstack));
+        assert_eq!(DomainId::parse("ai"), Some(DomainId::Ml));
+        assert_eq!(DomainId::parse("machine-learning"), Some(DomainId::Ml));
+        assert_eq!(DomainId::parse("sre"), Some(DomainId::Devops));
+        assert_eq!(DomainId::parse("sec"), Some(DomainId::Security));
+        assert_eq!(DomainId::parse("gamedev"), Some(DomainId::Game));
+        assert_eq!(DomainId::parse("swe"), Some(DomainId::General));
+        assert_eq!(DomainId::parse("  Frontend  "), Some(DomainId::Frontend));
+    }
+
+    #[test]
+    fn domain_unknown() {
+        assert_eq!(DomainId::parse("unknown"), None);
+        assert_eq!(DomainId::parse(""), None);
+        let err = DomainId::from_str("nope").unwrap_err();
+        assert!(err.contains("unknown domain"));
+        assert!(err.contains("frontend"));
+    }
+
+    #[test]
+    fn theme_mode_parse_and_display() {
+        assert_eq!(ThemeMode::from_str("system").unwrap(), ThemeMode::System);
+        assert_eq!(ThemeMode::from_str("LIGHT").unwrap(), ThemeMode::Light);
+        assert_eq!(ThemeMode::from_str("dark").unwrap(), ThemeMode::Dark);
+        assert!(ThemeMode::from_str("auto").is_err());
+        assert_eq!(ThemeMode::System.as_str(), "system");
+        assert_eq!(ThemeMode::Light.as_str(), "light");
+        assert_eq!(ThemeMode::Dark.as_str(), "dark");
+    }
+
+    #[test]
+    fn portfolio_serde_roundtrip() {
+        let cfg = PortfolioConfig {
+            meta: PortfolioMeta {
+                title: "T".into(),
+                description: "D".into(),
+                site_url: Some("https://x.test".into()),
+            },
+            domain: DomainId::Frontend,
+            person: PersonInfo {
+                name: "Ada".into(),
+                title: "Engineer".into(),
+                bio: "Bio".into(),
+                location: Some("Remote".into()),
+                avatar: None,
+                resume_url: None,
+            },
+            social: SocialLinks {
+                github: Some("https://github.com/ada".into()),
+                email: Some("a@x.test".into()),
+                ..Default::default()
+            },
+            greeting: Greeting {
+                headline: "Hi".into(),
+                subheadline: "Sub".into(),
+                cta_label: Some("Go".into()),
+                cta_href: Some("#projects".into()),
+            },
+            skills: SkillsSection {
+                title: "Skills".into(),
+                subtitle: None,
+                groups: vec![SkillGroup {
+                    name: "Lang".into(),
+                    items: vec![SkillItem {
+                        name: "Rust".into(),
+                        level: Some(90),
+                    }],
+                }],
+            },
+            experience: vec![],
+            education: vec![],
+            projects: vec![ProjectItem {
+                title: "P".into(),
+                description: "Desc".into(),
+                tags: vec!["t".into()],
+                image: None,
+                demo_url: None,
+                repo_url: None,
+                links: vec![],
+                featured: true,
+            }],
+            achievements: vec![],
+            blog: BlogConfig {
+                enabled: false,
+                title: None,
+                subtitle: None,
+                url: None,
+                posts: vec![],
+            },
+            contact: ContactInfo {
+                title: "Contact".into(),
+                subtitle: None,
+                email: Some("a@x.test".into()),
+                booking_url: None,
+            },
+            theme: ThemeConfig {
+                primary: "#ec4899".into(),
+                mode: ThemeMode::Dark,
+            },
+            sections: SectionsConfig {
+                skills: true,
+                experience: true,
+                projects: true,
+                education: true,
+                achievements: false,
+                blog: false,
+                contact: true,
+            },
+        };
+        let json = cfg.to_pretty_json().unwrap();
+        assert!(json.ends_with('\n'));
+        assert!(json.contains("\"domain\": \"frontend\""));
+        assert!(json.contains("\"mode\": \"dark\""));
+        // Optional empty fields omitted
+        assert!(!json.contains("\"avatar\""));
+        let back: PortfolioConfig = serde_json::from_str(json.trim()).unwrap();
+        assert_eq!(back.domain, DomainId::Frontend);
+        assert_eq!(back.person.name, "Ada");
+        assert_eq!(back.theme.mode, ThemeMode::Dark);
+        assert!(back.projects[0].featured);
+    }
+
+    #[test]
+    fn social_extra_serializes() {
+        let mut extra = std::collections::BTreeMap::new();
+        extra.insert("mastodon".into(), "https://mas.to/@x".into());
+        let social = SocialLinks {
+            extra: Some(extra),
+            ..Default::default()
+        };
+        let v = serde_json::to_value(&social).unwrap();
+        assert_eq!(v["extra"]["mastodon"], "https://mas.to/@x");
     }
 }

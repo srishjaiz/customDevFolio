@@ -112,3 +112,15 @@ fn shell_cd_path(path: &std::path::Path) -> String {
         s
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::path::Path;
+
+    #[test]
+    fn shell_cd_path_quotes_spaces() {
+        assert_eq!(shell_cd_path(Path::new("/tmp/my app")), "\"/tmp/my app\"");
+        assert_eq!(shell_cd_path(Path::new("/tmp/app")), "/tmp/app");
+    }
+}

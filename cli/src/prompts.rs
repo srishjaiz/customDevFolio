@@ -207,3 +207,84 @@ pub fn print_domains() {
 fn _domain_id_export() -> DomainId {
     DomainId::General
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::config::ThemeMode;
+    use crate::domain::{profile, CreateAnswers};
+
+    fn partial() -> CreateAnswers {
+        CreateAnswers {
+            project_name: "My Site".into(),
+            domain: DomainId::Frontend,
+            display_name: "".into(),
+            title: None,
+            bio: None,
+            location: None,
+            email: None,
+            github: None,
+            linkedin: None,
+            website: None,
+            resume_url: None,
+            primary_color: None,
+            theme_mode: ThemeMode::Light,
+            include_sample_content: true,
+        }
+    }
+
+    #[test]
+    fn apply_defaults_fills_gaps() {
+        let out = apply_defaults(partial());
+        assert_eq!(out.project_name, "my-site");
+        assert_eq!(out.display_name, "Developer");
+        assert_eq!(
+            out.title.as_deref(),
+            Some(profile(DomainId::Frontend).default_title)
+        );
+        assert_eq!(
+            out.primary_color.as_deref(),
+            Some(profile(DomainId::Frontend).default_primary)
+        );
+        assert_eq!(out.theme_mode, ThemeMode::Light);
+    }
+
+    #[test]
+    fn apply_defaults_preserves_set_fields() {
+        let mut a = partial();
+        a.display_name = "Ada".into();
+        a.title = Some("Lead".into());
+        a.primary_color = Some("#000000".into());
+        a.project_name = "already-ok".into();
+        let out = apply_defaults(a);
+        assert_eq!(out.display_name, "Ada");
+        assert_eq!(out.title.as_deref(), Some("Lead"));
+        assert_eq!(out.primary_color.as_deref(), Some("#000000"));
+        assert_eq!(out.project_name, "already-ok");
+    }
+
+    #[test]
+    fn apply_defaults_treats_whitespace_title_as_empty() {
+        let mut a = partial();
+        a.display_name = "  ".into();
+        a.title = Some("   ".into());
+        a.primary_color = Some("".into());
+        a.domain = DomainId::Ml;
+        let out = apply_defaults(a);
+        assert_eq!(out.display_name, "Developer");
+        assert_eq!(
+            out.title.as_deref(),
+            Some(profile(DomainId::Ml).default_title)
+        );
+        assert_eq!(
+            out.primary_color.as_deref(),
+            Some(profile(DomainId::Ml).default_primary)
+        );
+    }
+
+    #[test]
+    fn print_domains_runs_without_panic() {
+        // Smoke: exercises formatting path for all profiles.
+        print_domains();
+    }
+}

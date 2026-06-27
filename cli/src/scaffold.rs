@@ -171,13 +171,10 @@ mod tests {
     use crate::config::{DomainId, ThemeMode};
     use crate::domain::CreateAnswers;
 
-    #[test]
-    fn scaffold_writes_portfolio_and_package_name() {
-        let dir = tempfile::tempdir().unwrap();
-        let out = dir.path().join("demo-site");
-        let portfolio = CreateAnswers {
+    fn sample_portfolio(domain: DomainId) -> PortfolioConfig {
+        CreateAnswers {
             project_name: "demo-site".into(),
-            domain: DomainId::Ml,
+            domain,
             display_name: "Sam".into(),
             title: None,
             bio: None,
@@ -191,7 +188,14 @@ mod tests {
             theme_mode: ThemeMode::System,
             include_sample_content: true,
         }
-        .into_portfolio();
+        .into_portfolio()
+    }
+
+    #[test]
+    fn scaffold_writes_portfolio_and_package_name() {
+        let dir = tempfile::tempdir().unwrap();
+        let out = dir.path().join("demo-site");
+        let portfolio = sample_portfolio(DomainId::Ml);
 
         scaffold(ScaffoldOptions {
             output_dir: out.clone(),
@@ -205,11 +209,192 @@ mod tests {
         assert!(out.join("package.json").is_file());
         assert!(out.join("app/page.tsx").is_file());
         assert!(out.join("lib/domains.ts").is_file());
+        assert!(out.join("app/layout.tsx").is_file());
+        assert!(out.join("content/examples/frontend.json").is_file());
         let pkg = fs::read_to_string(out.join("package.json")).unwrap();
         assert!(pkg.contains("\"demo-site\""));
         let port = fs::read_to_string(out.join("content/portfolio.json")).unwrap();
         assert!(port.contains("\"ml\"") || port.contains("\"domain\": \"ml\""));
         // Embedded template should not include node_modules
         assert!(!out.join("node_modules").exists());
+        assert!(!out.join(".next").exists());
+    }
+
+    #[test]
+    fn resolve_output_dir_relative_and_absolute() {
+        let rel = resolve_output_dir("my-app");
+        assert_eq!(rel, PathBuf::from("./my-app"));
+
+        let with_slash = resolve_output_dir("path/to/app");
+        assert_eq!(with_slash, PathBuf::from("path/to/app"));
+
+        let with_backslash = resolve_output_dir("path\\to\\app");
+        assert_eq!(with_backslash, PathBuf::from("path\\to\\app"));
+
+        let abs = resolve_output_dir("/tmp/out");
+        assert_eq!(abs, PathBuf::from("/tmp/out"));
+
+        let sanitized = resolve_output_dir("My App");
+        assert_eq!(sanitized, PathBuf::from("./my-app"));
+    }
+
+    #[test]
+    fn prepare_output_dir_rejects_non_empty_without_force() {
+        let dir = tempfile::tempdir().unwrap();
+        let out = dir.path().join("existing");
+        fs::create_dir_all(&out).unwrap();
+        fs::write(out.join("keep.txt"), b"x").unwrap();
+
+        let err = prepare_output_dir(&out, false).unwrap_err();
+        assert!(err.to_string().contains("not empty"));
+        assert!(err.to_string().contains("--force"));
+    }
+
+    #[test]
+    fn prepare_output_dir_force_clears_contents() {
+        let dir = tempfile::tempdir().unwrap();
+        let out = dir.path().join("existing");
+        fs::create_dir_all(out.join("sub")).unwrap();
+        fs::write(out.join("keep.txt"), b"x").unwrap();
+        fs::write(out.join("sub/nested.txt"), b"y").unwrap();
+
+        prepare_output_dir(&out, true).unwrap();
+        assert!(out.exists());
+        assert!(fs::read_dir(&out).unwrap().next().is_none());
+    }
+
+    #[test]
+    fn prepare_output_dir_creates_missing() {
+        let dir = tempfile::tempdir().unwrap();
+        let out = dir.path().join("brand-new");
+        prepare_output_dir(&out, false).unwrap();
+        assert!(out.is_dir());
+    }
+
+    #[test]
+    fn prepare_output_dir_rejects_file_path() {
+        let dir = tempfile::tempdir().unwrap();
+        let file = dir.path().join("not-a-dir");
+        fs::write(&file, b"x").unwrap();
+        let err = prepare_output_dir(&file, false).unwrap_err();
+        assert!(err.to_string().contains("not a directory"));
+    }
+
+    #[test]
+    fn scaffold_force_overwrites_non_empty() {
+        let dir = tempfile::tempdir().unwrap();
+        let out = dir.path().join("site");
+        fs::create_dir_all(&out).unwrap();
+        fs::write(out.join("stale.txt"), b"old").unwrap();
+
+        scaffold(ScaffoldOptions {
+            output_dir: out.clone(),
+            package_name: "fresh-site".into(),
+            portfolio: sample_portfolio(DomainId::Backend),
+            force: true,
+            git_init: false,
+        })
+        .unwrap();
+
+        assert!(!out.join("stale.txt").exists());
+        let pkg = fs::read_to_string(out.join("package.json")).unwrap();
+        assert!(pkg.contains("\"fresh-site\""));
+    }
+
+    #[test]
+    fn scaffold_fails_without_force_on_non_empty() {
+        let dir = tempfile::tempdir().unwrap();
+        let out = dir.path().join("site");
+        fs::create_dir_all(&out).unwrap();
+        fs::write(out.join("stale.txt"), b"old").unwrap();
+
+        let err = scaffold(ScaffoldOptions {
+            output_dir: out,
+            package_name: "x".into(),
+            portfolio: sample_portfolio(DomainId::General),
+            force: false,
+            git_init: false,
+        })
+        .unwrap_err();
+        assert!(
+            err.to_string().contains("not empty")
+                || err.root_cause().to_string().contains("not empty")
+        );
+    }
+
+    #[test]
+    fn transform_file_rewrites_package_name() {
+        let input = br#"{"name":"customfolio-template","version":"0.1.0"}"#;
+        let out = transform_file("package.json", input, "my-folio").unwrap();
+        let text = String::from_utf8(out).unwrap();
+        assert!(text.contains("\"my-folio\""));
+        assert!(!text.contains("customfolio-template"));
+    }
+
+    #[test]
+    fn transform_file_leaves_other_paths() {
+        let data = b"hello";
+        let out = transform_file("README.md", data, "x").unwrap();
+        assert_eq!(out, data);
+    }
+
+    #[test]
+    fn transform_file_invalid_json_package_passthrough() {
+        let data = b"not json";
+        let out = transform_file("package.json", data, "x").unwrap();
+        assert_eq!(out, data);
+    }
+
+    #[test]
+    fn scaffold_sanitizes_package_name() {
+        let dir = tempfile::tempdir().unwrap();
+        let out = dir.path().join("out");
+        scaffold(ScaffoldOptions {
+            output_dir: out.clone(),
+            package_name: "My Cool Site".into(),
+            portfolio: sample_portfolio(DomainId::Frontend),
+            force: false,
+            git_init: false,
+        })
+        .unwrap();
+        let pkg = fs::read_to_string(out.join("package.json")).unwrap();
+        assert!(pkg.contains("\"my-cool-site\""));
+    }
+
+    #[test]
+    fn scaffold_optional_git_init() {
+        let dir = tempfile::tempdir().unwrap();
+        let out = dir.path().join("gitted");
+        // Should not fail even if git is missing; best-effort.
+        scaffold(ScaffoldOptions {
+            output_dir: out.clone(),
+            package_name: "gitted".into(),
+            portfolio: sample_portfolio(DomainId::Data),
+            force: false,
+            git_init: true,
+        })
+        .unwrap();
+        assert!(out.join("package.json").is_file());
+    }
+
+    #[test]
+    fn embedded_template_is_non_empty() {
+        let entries: Vec<_> = TemplateAssets::iter().collect();
+        assert!(
+            !entries.is_empty(),
+            "template embed must include files from ../template"
+        );
+        assert!(
+            entries.iter().any(|p| p.as_ref() == "package.json"),
+            "package.json must be embedded"
+        );
+        assert!(
+            entries.iter().any(|p| p.as_ref().starts_with("app/")),
+            "app/ sources must be embedded"
+        );
+        // portfolio.json is generated at scaffold time, not embedded
+        assert!(!entries
+            .iter()
+            .any(|p| p.as_ref() == "content/portfolio.json"));
     }
 }

@@ -119,3 +119,122 @@ pub struct CreateArgs {
 fn parse_domain(s: &str) -> Result<DomainId, String> {
     s.parse()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use clap::Parser;
+
+    #[test]
+    fn theme_mode_arg_converts() {
+        assert_eq!(ThemeMode::from(ThemeModeArg::System), ThemeMode::System);
+        assert_eq!(ThemeMode::from(ThemeModeArg::Light), ThemeMode::Light);
+        assert_eq!(ThemeMode::from(ThemeModeArg::Dark), ThemeMode::Dark);
+    }
+
+    #[test]
+    fn parse_domain_accepts_aliases() {
+        assert_eq!(parse_domain("fe").unwrap(), DomainId::Frontend);
+        assert_eq!(parse_domain("devops").unwrap(), DomainId::Devops);
+        assert!(parse_domain("nope").is_err());
+    }
+
+    #[test]
+    fn cli_parses_create_defaults() {
+        let cli = Cli::try_parse_from(["customfolio", "create"]).unwrap();
+        match cli.command {
+            Commands::Create(args) => {
+                assert_eq!(args.name, "my-portfolio");
+                assert!(!args.yes);
+                assert!(!args.force);
+                assert!(!args.git);
+                assert!(!args.minimal);
+                assert!(args.domain.is_none());
+                assert!(matches!(args.theme, ThemeModeArg::System));
+            }
+            Commands::Domains => panic!("expected create"),
+        }
+    }
+
+    #[test]
+    fn cli_parses_create_flags() {
+        let cli = Cli::try_parse_from([
+            "customfolio",
+            "create",
+            "site",
+            "-o",
+            "/tmp/out",
+            "-d",
+            "ml",
+            "--full-name",
+            "Sam",
+            "--title",
+            "ML Eng",
+            "--bio",
+            "hello",
+            "--location",
+            "NYC",
+            "--email",
+            "s@x.test",
+            "--github",
+            "sam",
+            "--linkedin",
+            "https://linkedin.com/in/sam",
+            "--website",
+            "https://sam.test",
+            "--resume-url",
+            "https://sam.test/cv",
+            "--primary",
+            "#0d9488",
+            "--theme",
+            "dark",
+            "-y",
+            "-f",
+            "--git",
+            "--minimal",
+        ])
+        .unwrap();
+        match cli.command {
+            Commands::Create(args) => {
+                assert_eq!(args.name, "site");
+                assert_eq!(
+                    args.output.as_deref(),
+                    Some(std::path::Path::new("/tmp/out"))
+                );
+                assert_eq!(args.domain, Some(DomainId::Ml));
+                assert_eq!(args.full_name.as_deref(), Some("Sam"));
+                assert_eq!(args.title.as_deref(), Some("ML Eng"));
+                assert_eq!(args.bio.as_deref(), Some("hello"));
+                assert_eq!(args.location.as_deref(), Some("NYC"));
+                assert_eq!(args.email.as_deref(), Some("s@x.test"));
+                assert_eq!(args.github.as_deref(), Some("sam"));
+                assert_eq!(
+                    args.linkedin.as_deref(),
+                    Some("https://linkedin.com/in/sam")
+                );
+                assert_eq!(args.website.as_deref(), Some("https://sam.test"));
+                assert_eq!(args.resume_url.as_deref(), Some("https://sam.test/cv"));
+                assert_eq!(args.primary.as_deref(), Some("#0d9488"));
+                assert!(matches!(args.theme, ThemeModeArg::Dark));
+                assert!(args.yes);
+                assert!(args.force);
+                assert!(args.git);
+                assert!(args.minimal);
+            }
+            Commands::Domains => panic!("expected create"),
+        }
+    }
+
+    #[test]
+    fn cli_parses_domains_subcommand() {
+        let cli = Cli::try_parse_from(["customfolio", "domains"]).unwrap();
+        assert!(matches!(cli.command, Commands::Domains));
+    }
+
+    #[test]
+    fn cli_rejects_unknown_domain_flag() {
+        let err = Cli::try_parse_from(["customfolio", "create", "--domain", "nope"]).unwrap_err();
+        let msg = err.to_string();
+        assert!(msg.contains("unknown domain") || msg.contains("invalid value"));
+    }
+}

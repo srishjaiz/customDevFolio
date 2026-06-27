@@ -157,6 +157,9 @@ The CLI embeds `template/` at **compile time** via `rust-embed` (excludes `node_
 cargo fmt --all -- --check
 cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace
+# optional local coverage (same gate as CI; needs llvm-tools + cargo-llvm-cov)
+# cargo install cargo-llvm-cov && rustup component add llvm-tools-preview
+# cargo llvm-cov --workspace --fail-under-lines 80
 cargo run -p customfolio -- domains
 cargo run -p customfolio -- create /tmp/demo --domain devops --yes
 
@@ -165,7 +168,7 @@ cargo build --release
 ./target/release/customfolio --help
 
 # Template (if you touch UI or content schema)
-cd template && pnpm install && pnpm typecheck && pnpm build
+cd template && pnpm install && pnpm typecheck && pnpm test && pnpm test:coverage && pnpm build
 ```
 
 ### Commit messages
@@ -207,8 +210,8 @@ Workflow: [`.github/workflows/ci.yml`](./.github/workflows/ci.yml) — runs on *
 | Job | Name (status check) | What it does |
 |-----|---------------------|--------------|
 | `changelog` | **Changelog** | PRs only: require `CHANGELOG.md` if commits/title are `feat` / `fix` / `perf` |
-| `rust` | **Rust (cli)** | `cargo fmt`, `clippy -D warnings`, `test`, release build, smoke `customfolio create --yes` |
-| `template` | **Next template** | `pnpm install --frozen-lockfile`, `typecheck`, `build` |
+| `rust` | **Rust (cli)** | `cargo fmt`, `clippy -D warnings`, `cargo llvm-cov` (fail under **80%** lines), release build, smoke `customfolio create --yes` |
+| `template` | **Next template** | `pnpm install --frozen-lockfile`, `typecheck`, `vitest` coverage (thresholds in `vitest.config.ts`), `build` |
 
 ## Branch protection
 
