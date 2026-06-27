@@ -529,10 +529,7 @@ mod tests {
             assert_eq!(cfg.person.title, profile(id).default_title);
             assert_eq!(cfg.theme.primary, profile(id).default_primary);
             assert!(!cfg.skills.groups.is_empty());
-            assert_eq!(
-                cfg.skills.groups.len(),
-                profile(id).skill_group_hints.len()
-            );
+            assert_eq!(cfg.skills.groups.len(), profile(id).skill_group_hints.len());
             assert!(!cfg.experience.is_empty());
             assert_eq!(cfg.projects.len(), 2);
             let json = cfg.to_pretty_json().unwrap();
@@ -637,10 +634,7 @@ mod tests {
         assert_eq!(cfg.person.title, profile(DomainId::Devops).default_title);
         assert!(cfg.social.email.is_none());
         assert!(cfg.social.github.is_none());
-        assert_eq!(
-            cfg.theme.primary,
-            profile(DomainId::Devops).default_primary
-        );
+        assert_eq!(cfg.theme.primary, profile(DomainId::Devops).default_primary);
     }
 
     #[test]

@@ -197,7 +197,10 @@ mod tests {
         match cli.command {
             Commands::Create(args) => {
                 assert_eq!(args.name, "site");
-                assert_eq!(args.output.as_deref(), Some(std::path::Path::new("/tmp/out")));
+                assert_eq!(
+                    args.output.as_deref(),
+                    Some(std::path::Path::new("/tmp/out"))
+                );
                 assert_eq!(args.domain, Some(DomainId::Ml));
                 assert_eq!(args.full_name.as_deref(), Some("Sam"));
                 assert_eq!(args.title.as_deref(), Some("ML Eng"));

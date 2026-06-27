@@ -80,7 +80,15 @@ fn create_minimal_skips_sample_experience() {
 #[test]
 fn create_all_domains_with_yes() {
     for domain in [
-        "frontend", "backend", "fullstack", "ml", "mobile", "devops", "data", "security", "game",
+        "frontend",
+        "backend",
+        "fullstack",
+        "ml",
+        "mobile",
+        "devops",
+        "data",
+        "security",
+        "game",
         "general",
     ] {
         let dir = tempdir().unwrap();

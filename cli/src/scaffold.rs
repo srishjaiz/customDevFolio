@@ -316,7 +316,10 @@ mod tests {
             git_init: false,
         })
         .unwrap_err();
-        assert!(err.to_string().contains("not empty") || err.root_cause().to_string().contains("not empty"));
+        assert!(
+            err.to_string().contains("not empty")
+                || err.root_cause().to_string().contains("not empty")
+        );
     }
 
     #[test]
@@ -390,6 +393,8 @@ mod tests {
             "app/ sources must be embedded"
         );
         // portfolio.json is generated at scaffold time, not embedded
-        assert!(!entries.iter().any(|p| p.as_ref() == "content/portfolio.json"));
+        assert!(!entries
+            .iter()
+            .any(|p| p.as_ref() == "content/portfolio.json"));
     }
 }
