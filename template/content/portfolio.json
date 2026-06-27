@@ -1,0 +1,185 @@
+{
+  "meta": {
+    "title": "Alex Rivera — Full-Stack Engineer",
+    "description": "Full-stack engineer building reliable products from UI to infrastructure.",
+    "siteUrl": "https://example.dev"
+  },
+  "domain": "fullstack",
+  "person": {
+    "name": "Alex Rivera",
+    "title": "Full-Stack Engineer",
+    "bio": "I design and ship end-to-end web products—clean interfaces, solid APIs, and pragmatic cloud setups. Open to interesting problems and thoughtful collaboration.",
+    "location": "Remote / Earth",
+    "avatar": "",
+    "resumeUrl": "#"
+  },
+  "social": {
+    "github": "https://github.com",
+    "linkedin": "https://linkedin.com",
+    "twitter": "https://x.com",
+    "email": "hello@example.dev",
+    "website": "https://example.dev"
+  },
+  "greeting": {
+    "headline": "Hi, I'm Alex — I build full-stack products people enjoy using.",
+    "subheadline": "TypeScript across the stack, with a bias for clarity, performance, and maintainable systems.",
+    "ctaLabel": "View projects",
+    "ctaHref": "#projects"
+  },
+  "skills": {
+    "title": "Skills",
+    "subtitle": "Tools I reach for most often",
+    "groups": [
+      {
+        "name": "Frontend",
+        "items": [
+          { "name": "TypeScript", "level": 90 },
+          { "name": "React", "level": 88 },
+          { "name": "Next.js", "level": 85 },
+          { "name": "Tailwind CSS", "level": 82 }
+        ]
+      },
+      {
+        "name": "Backend",
+        "items": [
+          { "name": "Node.js", "level": 86 },
+          { "name": "PostgreSQL", "level": 80 },
+          { "name": "REST / GraphQL", "level": 84 },
+          { "name": "Redis", "level": 72 }
+        ]
+      },
+      {
+        "name": "DevOps",
+        "items": [
+          { "name": "Docker", "level": 78 },
+          { "name": "CI/CD", "level": 75 },
+          { "name": "AWS", "level": 70 },
+          { "name": "Terraform", "level": 65 }
+        ]
+      },
+      {
+        "name": "Testing",
+        "items": [
+          { "name": "Vitest / Jest", "level": 80 },
+          { "name": "Playwright", "level": 72 },
+          { "name": "Testing Library", "level": 78 }
+        ]
+      }
+    ]
+  },
+  "experience": [
+    {
+      "role": "Senior Full-Stack Engineer",
+      "company": "Northstar Labs",
+      "location": "Remote",
+      "startDate": "2022",
+      "endDate": "Present",
+      "description": "Lead delivery of customer-facing dashboards and internal APIs for a B2B analytics product.",
+      "highlights": [
+        "Cut p95 API latency 40% with query tuning and caching",
+        "Introduced design tokens and a shared UI kit used by 3 squads",
+        "Owned on-call rotation for core billing services"
+      ],
+      "tech": ["Next.js", "Node.js", "PostgreSQL", "AWS"],
+      "url": "https://example.com"
+    },
+    {
+      "role": "Software Engineer",
+      "company": "Harbor Digital",
+      "location": "Hybrid",
+      "startDate": "2019",
+      "endDate": "2022",
+      "description": "Built multi-tenant SaaS features across web client and NestJS services.",
+      "highlights": [
+        "Shipped SSO and role-based access for enterprise customers",
+        "Migrated legacy REST surface to versioned APIs with OpenAPI docs"
+      ],
+      "tech": ["React", "NestJS", "MySQL", "Docker"]
+    }
+  ],
+  "education": [
+    {
+      "school": "State University",
+      "degree": "B.S.",
+      "field": "Computer Science",
+      "startDate": "2015",
+      "endDate": "2019",
+      "description": "Focus on distributed systems and HCI electives."
+    }
+  ],
+  "projects": [
+    {
+      "title": "Pulseboard",
+      "description": "Real-time ops dashboard with role-aware widgets and exportable reports. Built as a reference multi-tenant Next app.",
+      "tags": ["Next.js", "WebSockets", "PostgreSQL"],
+      "demoUrl": "https://example.com",
+      "repoUrl": "https://github.com",
+      "featured": true
+    },
+    {
+      "title": "SchemaForge CLI",
+      "description": "Developer tool that generates typed API clients from OpenAPI with CI drift checks.",
+      "tags": ["TypeScript", "CLI", "OpenAPI"],
+      "repoUrl": "https://github.com",
+      "featured": true
+    },
+    {
+      "title": "TinyTrace",
+      "description": "Lightweight OpenTelemetry sampler and flamegraph viewer for local debugging.",
+      "tags": ["Go", "OTel", "DX"],
+      "repoUrl": "https://github.com"
+    }
+  ],
+  "achievements": [
+    {
+      "title": "Speaker — Local JS Meetup",
+      "issuer": "City.js",
+      "date": "2024",
+      "description": "Talk on progressive migration strategies for monolith frontends.",
+      "url": "https://example.com"
+    },
+    {
+      "title": "Open Source Maintainer",
+      "description": "Maintain a small React form utility with 1k+ weekly downloads."
+    }
+  ],
+  "blog": {
+    "enabled": true,
+    "title": "Writing",
+    "subtitle": "Notes on shipping and systems",
+    "url": "https://example.dev/blog",
+    "posts": [
+      {
+        "title": "Designing APIs your frontend will thank you for",
+        "url": "https://example.dev/blog/api-design",
+        "date": "2025-11",
+        "summary": "Practical conventions for errors, pagination, and evolution."
+      },
+      {
+        "title": "When to reach for edge vs origin",
+        "url": "https://example.dev/blog/edge",
+        "date": "2025-06",
+        "summary": "A decision checklist for Next.js deployment topologies."
+      }
+    ]
+  },
+  "contact": {
+    "title": "Let's work together",
+    "subtitle": "Open to full-time roles, consulting, and interesting collaborations.",
+    "email": "hello@example.dev",
+    "bookingUrl": ""
+  },
+  "theme": {
+    "primary": "#6366f1",
+    "mode": "system"
+  },
+  "sections": {
+    "skills": true,
+    "experience": true,
+    "projects": true,
+    "education": true,
+    "achievements": true,
+    "blog": true,
+    "contact": true
+  }
+}

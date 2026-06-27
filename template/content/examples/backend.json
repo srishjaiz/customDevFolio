@@ -1,0 +1,110 @@
+{
+  "meta": {
+    "title": "Morgan Blake — Backend Engineer",
+    "description": "Backend engineer building APIs, data models, and resilient services.",
+    "siteUrl": "https://example.dev"
+  },
+  "domain": "backend",
+  "person": {
+    "name": "Morgan Blake",
+    "title": "Backend Engineer",
+    "bio": "I design APIs and services that stay understandable under load—and under on-call.",
+    "location": "Toronto, CA",
+    "resumeUrl": "#"
+  },
+  "social": {
+    "github": "https://github.com",
+    "linkedin": "https://linkedin.com",
+    "email": "morgan@example.dev"
+  },
+  "greeting": {
+    "headline": "Backend engineer for APIs, data, and distributed systems.",
+    "subheadline": "Go, Postgres, and careful service boundaries.",
+    "ctaLabel": "View systems",
+    "ctaHref": "#projects"
+  },
+  "skills": {
+    "title": "Skills",
+    "groups": [
+      {
+        "name": "Languages",
+        "items": [
+          { "name": "Go", "level": 90 },
+          { "name": "Python", "level": 75 },
+          { "name": "SQL", "level": 88 }
+        ]
+      },
+      {
+        "name": "Data & messaging",
+        "items": [
+          { "name": "PostgreSQL", "level": 90 },
+          { "name": "Kafka", "level": 78 },
+          { "name": "Redis", "level": 80 }
+        ]
+      },
+      {
+        "name": "Cloud & ops",
+        "items": [
+          { "name": "AWS", "level": 82 },
+          { "name": "Docker", "level": 85 },
+          { "name": "gRPC", "level": 80 }
+        ]
+      }
+    ]
+  },
+  "experience": [
+    {
+      "role": "Backend Engineer",
+      "company": "Ledgerworks",
+      "startDate": "2019",
+      "endDate": "Present",
+      "description": "Payments platform services, idempotency, and ledger integrity.",
+      "highlights": [
+        "Designed event-sourced balance pipeline with exactly-once effects",
+        "Led migration from monolith handlers to domain services"
+      ],
+      "tech": ["Go", "PostgreSQL", "Kafka"]
+    }
+  ],
+  "education": [
+    {
+      "school": "Northern University",
+      "degree": "B.S.",
+      "field": "Computer Science",
+      "endDate": "2018"
+    }
+  ],
+  "projects": [
+    {
+      "title": "Idempotency Kit",
+      "description": "Library and middleware patterns for safe retries across HTTP and queues.",
+      "tags": ["Go", "Distributed systems"],
+      "repoUrl": "https://github.com",
+      "featured": true
+    },
+    {
+      "title": "Query Budget",
+      "description": "Postgres EXPLAIN sampler with CI budgets for hot endpoints.",
+      "tags": ["PostgreSQL", "Observability"],
+      "repoUrl": "https://github.com",
+      "featured": true
+    }
+  ],
+  "achievements": [],
+  "blog": { "enabled": false, "title": "Blog", "posts": [] },
+  "contact": {
+    "title": "Contact",
+    "subtitle": "Backend and platform roles welcome.",
+    "email": "morgan@example.dev"
+  },
+  "theme": { "primary": "#3b82f6", "mode": "system" },
+  "sections": {
+    "skills": true,
+    "experience": true,
+    "projects": true,
+    "education": true,
+    "achievements": false,
+    "blog": false,
+    "contact": true
+  }
+}

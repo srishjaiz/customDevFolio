@@ -1,0 +1,83 @@
+{
+  "meta": {
+    "title": "Demo User — Game Developer",
+    "description": "Sample Game Developer portfolio for customFolio template previews.",
+    "siteUrl": "https://example.dev"
+  },
+  "domain": "game",
+  "person": {
+    "name": "Demo User",
+    "title": "Game Developer",
+    "bio": "Sample bio focused on Gameplay and engines. Replace via content/portfolio.json or the future CLI.",
+    "location": "Remote",
+    "resumeUrl": "#"
+  },
+  "social": {
+    "github": "https://github.com",
+    "linkedin": "https://linkedin.com",
+    "email": "demo@example.dev"
+  },
+  "greeting": {
+    "headline": "Game Developer portfolio template preview.",
+    "subheadline": "Edit this JSON to match your story. Domain id: game.",
+    "ctaLabel": "View projects",
+    "ctaHref": "#projects"
+  },
+  "skills": {
+    "title": "Skills",
+    "groups": [
+      {
+        "name": "Core",
+        "items": [
+          { "name": "Primary stack", "level": 85 },
+          { "name": "Secondary tools", "level": 75 }
+        ]
+      }
+    ]
+  },
+  "experience": [
+    {
+      "role": "Game Developer",
+      "company": "Example Co",
+      "startDate": "2022",
+      "endDate": "Present",
+      "description": "Placeholder experience for the game domain preset.",
+      "highlights": ["Ship impactful work", "Mentor teammates"],
+      "tech": ["Example"]
+    }
+  ],
+  "education": [
+    {
+      "school": "Example University",
+      "degree": "B.S.",
+      "field": "Computer Science",
+      "endDate": "2021"
+    }
+  ],
+  "projects": [
+    {
+      "title": "Sample project",
+      "description": "Domain-flavored project placeholder for game.",
+      "tags": ["game"],
+      "repoUrl": "https://github.com",
+      "featured": true
+    }
+  ],
+  "achievements": [],
+  "blog": { "enabled": false, "posts": [] },
+  "contact": {
+    "title": "Contact",
+    "subtitle": "Replace with your preferred outreach.",
+    "email": "demo@example.dev"
+  },
+  "theme": { "primary": "#22c55e", "mode": "system" },
+  "sections": {
+    "skills": true,
+    "experience": true,
+    "projects": true,
+    "education": true,
+    "achievements": true,
+    "blog": false,
+    "contact": true
+  }
+}

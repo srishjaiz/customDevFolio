@@ -1,0 +1,125 @@
+{
+  "meta": {
+    "title": "Jordan Lee — DevOps / SRE",
+    "description": "Platform and reliability engineer focused on CI/CD, Kubernetes, and observability.",
+    "siteUrl": "https://example.dev"
+  },
+  "domain": "devops",
+  "person": {
+    "name": "Jordan Lee",
+    "title": "DevOps / SRE Engineer",
+    "bio": "I build paved roads for developers: safe deploys, clear signals, and infrastructure you can reason about.",
+    "location": "Austin, TX",
+    "resumeUrl": "#"
+  },
+  "social": {
+    "github": "https://github.com",
+    "linkedin": "https://linkedin.com",
+    "email": "jordan@example.dev"
+  },
+  "greeting": {
+    "headline": "Platform engineer making deploys boring (in a good way).",
+    "subheadline": "Kubernetes, Terraform, and observability for teams that ship often.",
+    "ctaLabel": "View platform work",
+    "ctaHref": "#projects"
+  },
+  "skills": {
+    "title": "Skills",
+    "groups": [
+      {
+        "name": "Cloud",
+        "items": [
+          { "name": "AWS", "level": 88 },
+          { "name": "GCP", "level": 70 }
+        ]
+      },
+      {
+        "name": "IaC & CI/CD",
+        "items": [
+          { "name": "Terraform", "level": 90 },
+          { "name": "GitHub Actions", "level": 88 },
+          { "name": "Argo CD", "level": 75 }
+        ]
+      },
+      {
+        "name": "Containers & Observability",
+        "items": [
+          { "name": "Kubernetes", "level": 86 },
+          { "name": "Prometheus / Grafana", "level": 82 },
+          { "name": "OpenTelemetry", "level": 78 }
+        ]
+      }
+    ]
+  },
+  "experience": [
+    {
+      "role": "SRE",
+      "company": "Relay Cloud",
+      "startDate": "2020",
+      "endDate": "Present",
+      "description": "Own multi-cluster platform, golden paths, and incident response.",
+      "highlights": [
+        "Reduced MTTR 50% with better runbooks and paging policy",
+        "Standardized Terraform modules adopted by 12 product teams"
+      ],
+      "tech": ["Kubernetes", "Terraform", "AWS"]
+    }
+  ],
+  "education": [
+    {
+      "school": "State College",
+      "degree": "B.S.",
+      "field": "Information Systems",
+      "endDate": "2018"
+    }
+  ],
+  "projects": [
+    {
+      "title": "Paved Road Chart Gallery",
+      "description": "Opinionated Helm charts and Terraform modules for internal services.",
+      "tags": ["Helm", "Terraform", "K8s"],
+      "repoUrl": "https://github.com",
+      "featured": true
+    },
+    {
+      "title": "SLO Composer",
+      "description": "CLI that turns service manifests into Prometheus recording rules and Grafana boards.",
+      "tags": ["Go", "Prometheus", "SRE"],
+      "repoUrl": "https://github.com",
+      "featured": true
+    }
+  ],
+  "achievements": [
+    {
+      "title": "CKA",
+      "issuer": "CNCF",
+      "date": "2023"
+    }
+  ],
+  "blog": {
+    "enabled": true,
+    "title": "Ops notes",
+    "posts": [
+      {
+        "title": "Pager policy that respects humans",
+        "url": "https://example.dev/blog/pager",
+        "date": "2025-04"
+      }
+    ]
+  },
+  "contact": {
+    "title": "Contact",
+    "subtitle": "Open to platform and SRE opportunities.",
+    "email": "jordan@example.dev"
+  },
+  "theme": { "primary": "#f59e0b", "mode": "dark" },
+  "sections": {
+    "skills": true,
+    "experience": true,
+    "projects": true,
+    "education": true,
+    "achievements": true,
+    "blog": true,
+    "contact": true
+  }
+}

@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# Prefer repo .gitmessage when no -m/-F was used (source=template|message|merge|squash|commit).
+set -euo pipefail
+
+MSG_FILE="${1:-}"
+SOURCE="${2:-}"
+
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+TEMPLATE="${ROOT}/.gitmessage"
+
+# Only inject when starting a fresh message (not merge/squash/commit -c)
+if [[ -n "$MSG_FILE" && -f "$TEMPLATE" ]]; then
+  case "${SOURCE:-}" in
+    merge|squash|commit) ;;
+    *)
+      # If message is empty or only comments, seed template
+      if ! grep -qE '^[^#[:space:]]' "$MSG_FILE" 2>/dev/null; then
+        # Keep any existing content (e.g. verbose path) after template
+        {
+          cat "$TEMPLATE"
+          echo ""
+          # Preserve non-comment lines already present
+          grep -vE '^\s*#' "$MSG_FILE" 2>/dev/null || true
+        } >"${MSG_FILE}.new"
+        mv "${MSG_FILE}.new" "$MSG_FILE"
+      fi
+      ;;
+  esac
+fi

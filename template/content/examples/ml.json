@@ -1,0 +1,132 @@
+{
+  "meta": {
+    "title": "Sam Chen — ML Engineer",
+    "description": "Machine learning engineer focused on applied NLP and reliable training pipelines.",
+    "siteUrl": "https://example.dev"
+  },
+  "domain": "ml",
+  "person": {
+    "name": "Sam Chen",
+    "title": "Machine Learning Engineer",
+    "bio": "I turn research ideas into production ML systems—data quality, evaluation, and serving included.",
+    "location": "San Francisco, CA",
+    "resumeUrl": "#"
+  },
+  "social": {
+    "github": "https://github.com",
+    "linkedin": "https://linkedin.com",
+    "email": "sam@example.dev",
+    "extra": {
+      "huggingface": "https://huggingface.co",
+      "scholar": "https://scholar.google.com"
+    }
+  },
+  "greeting": {
+    "headline": "ML engineer shipping models that hold up in production.",
+    "subheadline": "NLP, evaluation harnesses, and MLOps for teams that need trustworthy predictions.",
+    "ctaLabel": "View models & projects",
+    "ctaHref": "#projects"
+  },
+  "skills": {
+    "title": "Skills",
+    "subtitle": "Research-to-production toolkit",
+    "groups": [
+      {
+        "name": "Languages",
+        "items": [
+          { "name": "Python", "level": 92 },
+          { "name": "SQL", "level": 80 },
+          { "name": "TypeScript", "level": 60 }
+        ]
+      },
+      {
+        "name": "ML frameworks",
+        "items": [
+          { "name": "PyTorch", "level": 90 },
+          { "name": "Hugging Face", "level": 85 },
+          { "name": "scikit-learn", "level": 82 }
+        ]
+      },
+      {
+        "name": "MLOps",
+        "items": [
+          { "name": "MLflow", "level": 78 },
+          { "name": "Kubeflow / K8s", "level": 70 },
+          { "name": "Feature stores", "level": 68 }
+        ]
+      }
+    ]
+  },
+  "experience": [
+    {
+      "role": "ML Engineer",
+      "company": "Signal AI",
+      "startDate": "2021",
+      "endDate": "Present",
+      "description": "Own classification and retrieval models powering customer support automation.",
+      "highlights": [
+        "Improved F1 by 9 points with better negatives and calibration",
+        "Cut training cost 35% via dataset dedup and mixed precision"
+      ],
+      "tech": ["PyTorch", "Ray", "AWS SageMaker"]
+    }
+  ],
+  "education": [
+    {
+      "school": "Tech Institute",
+      "degree": "M.S.",
+      "field": "Computer Science (ML)",
+      "endDate": "2021"
+    }
+  ],
+  "projects": [
+    {
+      "title": "EvalKit",
+      "description": "Offline evaluation suite for RAG systems with regression gates in CI.",
+      "tags": ["Python", "RAG", "Evaluation"],
+      "repoUrl": "https://github.com",
+      "links": [{ "label": "Paper notes", "href": "https://example.com" }],
+      "featured": true
+    },
+    {
+      "title": "TinyLLM Adapter Zoo",
+      "description": "Collection of LoRA adapters and serving recipes for domain chatbots.",
+      "tags": ["LoRA", "vLLM", "NLP"],
+      "repoUrl": "https://github.com",
+      "featured": true
+    }
+  ],
+  "achievements": [
+    {
+      "title": "Workshop instructor — Applied RAG",
+      "date": "2025",
+      "description": "Half-day workshop for 80 practitioners."
+    }
+  ],
+  "blog": {
+    "enabled": true,
+    "title": "Notes",
+    "posts": [
+      {
+        "title": "Calibration beats clever prompts",
+        "url": "https://example.dev/blog/calibration",
+        "date": "2025-09"
+      }
+    ]
+  },
+  "contact": {
+    "title": "Contact",
+    "subtitle": "Happy to talk applied ML roles and open-source collaboration.",
+    "email": "sam@example.dev"
+  },
+  "theme": { "primary": "#0d9488", "mode": "system" },
+  "sections": {
+    "skills": true,
+    "experience": true,
+    "projects": true,
+    "education": true,
+    "achievements": true,
+    "blog": true,
+    "contact": true
+  }
+}

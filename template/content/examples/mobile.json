@@ -1,0 +1,100 @@
+{
+  "meta": {
+    "title": "Casey Ortiz — Mobile Engineer",
+    "description": "Mobile engineer shipping iOS and cross-platform apps.",
+    "siteUrl": "https://example.dev"
+  },
+  "domain": "mobile",
+  "person": {
+    "name": "Casey Ortiz",
+    "title": "Mobile Engineer",
+    "bio": "I build polished mobile experiences with a focus on offline-first UX and clean architecture.",
+    "location": "Madrid, ES",
+    "resumeUrl": "#"
+  },
+  "social": {
+    "github": "https://github.com",
+    "linkedin": "https://linkedin.com",
+    "email": "casey@example.dev",
+    "extra": {
+      "appstore": "https://apps.apple.com",
+      "playstore": "https://play.google.com"
+    }
+  },
+  "greeting": {
+    "headline": "Mobile engineer for iOS and cross-platform products.",
+    "subheadline": "Swift, Kotlin, and React Native when the product needs speed.",
+    "ctaLabel": "View apps",
+    "ctaHref": "#projects"
+  },
+  "skills": {
+    "title": "Skills",
+    "groups": [
+      {
+        "name": "Platforms",
+        "items": [
+          { "name": "iOS / Swift", "level": 90 },
+          { "name": "Android / Kotlin", "level": 78 },
+          { "name": "React Native", "level": 82 }
+        ]
+      },
+      {
+        "name": "Architecture",
+        "items": [
+          { "name": "SwiftUI", "level": 88 },
+          { "name": "MVVM / TCA", "level": 84 },
+          { "name": "Offline sync", "level": 80 }
+        ]
+      }
+    ]
+  },
+  "experience": [
+    {
+      "role": "Mobile Engineer",
+      "company": "Wayfare",
+      "startDate": "2020",
+      "endDate": "Present",
+      "description": "Consumer travel app on iOS with shared RN modules.",
+      "highlights": [
+        "Shipped offline trip plans used by 200k MAU",
+        "Cut crash-free sessions regressions with better CI device farms"
+      ],
+      "tech": ["Swift", "React Native", "GraphQL"]
+    }
+  ],
+  "education": [
+    {
+      "school": "Polytechnic",
+      "degree": "B.Eng.",
+      "field": "Software Engineering",
+      "endDate": "2019"
+    }
+  ],
+  "projects": [
+    {
+      "title": "TrailLog",
+      "description": "Hiking journal with GPS tracks and shareable maps.",
+      "tags": ["SwiftUI", "MapKit"],
+      "links": [
+        { "label": "App Store", "href": "https://apps.apple.com" }
+      ],
+      "featured": true
+    }
+  ],
+  "achievements": [],
+  "blog": { "enabled": false, "posts": [] },
+  "contact": {
+    "title": "Contact",
+    "email": "casey@example.dev"
+  },
+  "theme": { "primary": "#8b5cf6", "mode": "system" },
+  "sections": {
+    "skills": true,
+    "experience": true,
+    "projects": true,
+    "education": true,
+    "achievements": false,
+    "blog": false,
+    "contact": true
+  }
+}
