@@ -1,95 +1,59 @@
 # Contributing
 
-## One-time setup (required)
-
-From the repo root:
+Minimal path — **no mandatory setup script**.
 
 ```bash
-./scripts/setup-git.sh
+git clone <repo> && cd customFolio   # or your fork
+git checkout -b my-change
+# … edit …
+make check                          # fmt + clippy + tests (+ template if pnpm is installed)
+git add -A && git commit            # opens .gitmessage template after first `make` / `make setup`
+git push -u origin HEAD
+gh pr create                        # PR template is applied automatically
 ```
 
-This sets:
+`make check` (and `make setup`) auto-configure this clone’s commit template and git hooks. Hooks are **advisory** (tips only). **CI is the source of truth.**
 
-| Setting | Purpose |
-|---------|---------|
-| `commit.template` → `.gitmessage` | Editor opens with commit message guidance |
-| `core.hooksPath` → `.githooks` | Enforces commit format and changelog on push |
+## What CI requires on PRs
 
-Without this, commits may be rejected by hooks once configured, and teammates won’t share the same checks.
+| Check | When it matters |
+|-------|-----------------|
+| **Rust (cli)** | Always — `fmt`, `clippy`, tests + coverage (≥80% lines), release smoke |
+| **Next template** | Always — typecheck, vitest coverage, build |
+| **Changelog** | If commits or PR title are `feat` / `fix` / `perf` — update [`CHANGELOG.md`](./CHANGELOG.md) under `## [Unreleased]` |
 
-## Commit messages (required)
+You do **not** need `cargo-llvm-cov` or local coverage tools; CI runs those gates.
 
-Use **[Conventional Commits](https://www.conventionalcommits.org/)**:
+## Commit messages (preferred)
 
-```text
-<type>(<optional-scope>): <summary>
-
-[optional body]
-
-[optional footer]
-```
-
-**Types:** `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`  
-**Scopes (examples):** `cli`, `template`, `ci`, `docs`
-
-The `commit-msg` hook rejects non-conforming subjects (except merge/revert).
-
-Examples:
+[Conventional Commits](https://www.conventionalcommits.org/):
 
 ```text
 feat(cli): add --minimal scaffold mode
-fix(template): respect sections.blog when posts empty
-docs: add PR and commit templates
-ci: require status checks on main
+fix(template): hide blog when posts empty
+docs: clarify contribute flow
 ```
 
-Prefer `git commit` (opens template) over one-line `-m` until you’re fluent with the format. If you use `-m`, still follow the pattern above.
+Types: `feat` `fix` `docs` `style` `refactor` `perf` `test` `build` `ci` `chore` `revert`.
 
-## Changelog (required for user-facing changes)
+## Make targets
 
-Update [`CHANGELOG.md`](./CHANGELOG.md) in the **same PR** (ideally same commit or a follow-up on the branch) for:
+| Command | Purpose |
+|---------|---------|
+| `make` / `make check` | Local checks before a PR |
+| `make setup` | Wire commit template + hooks (also done by `make check`) |
+| `make test` | `cargo test --workspace` |
+| `make fmt` | Apply `rustfmt` |
+| `make template-test` | Template typecheck + unit tests + build |
+| `make contribute` | Print this flow |
+| `make help` | List targets |
 
-- `feat`, `fix`, `perf`
-- Any `BREAKING CHANGE`
+Without Make: `./scripts/check.sh` (same as `make check`).
 
-Add bullets under `## [Unreleased]` (or the next version section) using Keep a Changelog categories: **Added**, **Changed**, **Fixed**, **Removed**.
+## Scope tips
 
-The `pre-push` hook blocks pushes that introduce `feat`/`fix`/`perf` commits without any `CHANGELOG.md` change on the branch. Escape hatch (discouraged): `SKIP_CHANGELOG_CHECK=1 git push`.
+- **CLI only** — `SKIP_TEMPLATE=1 make check` or just `cargo test --workspace` after `cargo fmt` / `clippy`.
+- **Template only** — `SKIP_RUST=1 make check` (needs `pnpm`).
+- Prefer a **feature branch + PR** into `main` (`main` is protected).
 
-Docs-only, CI-only, or pure chore work may skip the changelog; say so in the PR template checkbox.
-
-## Pull requests (required template)
-
-Opening a PR loads [`.github/PULL_REQUEST_TEMPLATE.md`](./.github/PULL_REQUEST_TEMPLATE.md). Fill in:
-
-1. **Summary**
-2. **Changelog** (checkbox + entry or N/A)
-3. **Type of change**
-4. **Test plan**
-
-`main` requires green CI (**Rust (cli)**, **Next template**) before merge. See README **Branch protection**.
-
-## Local checks
-
-```bash
-cargo fmt --all -- --check
-cargo clippy --workspace --all-targets -- -D warnings
-cargo test --workspace
-# CI also runs: cargo llvm-cov --workspace --fail-under-lines 80
-# if you touched template/
-cd template && pnpm typecheck && pnpm test && pnpm test:coverage && pnpm build
-```
-
-## CI changelog check
-
-On pull requests, the **Changelog** job runs `./scripts/check-changelog.sh` against `origin/<base>..HEAD`.
-
-It fails if any commit subject (or the PR title) starts with `feat` / `fix` / `perf` and `CHANGELOG.md` is not changed on the branch.
-
-Local preview:
-
-```bash
-./scripts/check-changelog.sh origin/main HEAD
-```
-
-Escape hatch in a commit subject (discouraged): `[skip changelog]`.
+Questions? Open an issue or draft PR and iterate with CI.

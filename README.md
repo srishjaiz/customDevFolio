@@ -130,18 +130,21 @@ Full template notes: [`template/README.md`](./template/README.md).
 ```text
 customFolio/
 ├── Cargo.toml                 # Rust workspace
+├── Makefile                   # make check / setup / test / help (preferred DX)
 ├── CHANGELOG.md               # Keep a Changelog (required for feat/fix/perf PRs)
-├── CONTRIBUTING.md            # Commits, PRs, hooks, CI expectations
+├── CONTRIBUTING.md            # Minimal contribute loop + CI expectations
 ├── README.md
-├── .gitmessage                # Commit message template (Conventional Commits)
-├── .githooks/                 # commit-msg, prepare-commit-msg, pre-push
+├── .gitmessage                # Commit template (auto-wired by make check)
+├── .githooks/                 # Advisory commit-msg / pre-push tips (CI is the gate)
 ├── .github/
 │   ├── PULL_REQUEST_TEMPLATE.md
 │   └── workflows/ci.yml       # Rust + Next + Changelog jobs
 ├── cli/                       # customfolio binary (embeds template/)
 ├── scripts/
-│   ├── setup-git.sh           # enable commit template + hooks (run once per clone)
-│   └── check-changelog.sh     # local + CI changelog gate
+│   ├── check.sh               # Same as make check (no Make required)
+│   ├── ensure-git-setup.sh    # Idempotent commit.template + hooksPath
+│   ├── setup-git.sh           # Alias → ensure-git-setup.sh
+│   └── check-changelog.sh     # CI changelog gate (optional local preview)
 └── template/                  # Next.js portfolio source of truth
 ```
 
@@ -149,83 +152,39 @@ The CLI embeds `template/` at **compile time** via `rust-embed` (excludes `node_
 
 ## Develop (contributors)
 
-```bash
-# one-time per clone — commit template + enforcement hooks
-./scripts/setup-git.sh
+**Minimal loop** — no required one-time setup script:
 
-# Rust CLI
-cargo fmt --all -- --check
-cargo clippy --workspace --all-targets -- -D warnings
-cargo test --workspace
-# optional local coverage (same gate as CI; needs llvm-tools + cargo-llvm-cov)
-# cargo install cargo-llvm-cov && rustup component add llvm-tools-preview
-# cargo llvm-cov --workspace --fail-under-lines 80
+```bash
+git checkout -b my-change
+# … edit …
+make check                 # fmt + clippy + tests (+ template if pnpm is installed)
+git commit -m "feat(cli): …" && git push -u origin HEAD && gh pr create
+```
+
+`make check` auto-wires the commit message template and git hooks for this clone. Hooks are **tips only**; **CI enforces** quality (coverage, changelog for `feat`/`fix`/`perf`). Details: [`CONTRIBUTING.md`](./CONTRIBUTING.md). Useful targets: `make help`, `make contribute`, `make test`, `make fmt`.
+
+```bash
+# Try the CLI while developing
 cargo run -p customfolio -- domains
 cargo run -p customfolio -- create /tmp/demo --domain devops --yes
 
 # Release binary (LTO, stripped — see workspace Cargo.toml)
-cargo build --release
-./target/release/customfolio --help
-
-# Template (if you touch UI or content schema)
-cd template && pnpm install && pnpm typecheck && pnpm test && pnpm test:coverage && pnpm build
+cargo build --release && ./target/release/customfolio --help
 ```
 
-### Commit messages
-
-Use **[Conventional Commits](https://www.conventionalcommits.org/)** (enforced by `.githooks/commit-msg` after setup):
-
-```text
-feat(cli): add --minimal scaffold mode
-fix(template): hide blog when posts empty
-docs: expand README with CI and domains
-ci: require Changelog status check on main
-```
-
-Types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`. Prefer `git commit` (loads `.gitmessage`) over ad-hoc `-m` until the format is familiar.
-
-### Changelog
-
-For **`feat` / `fix` / `perf`** (and breaking changes), update [`CHANGELOG.md`](./CHANGELOG.md) in the same PR—typically under **`## [Unreleased]`** (Added / Changed / Fixed / Removed).
-
-- **Local push hook:** `.githooks/pre-push` blocks pushes that add those commit types without a `CHANGELOG.md` change on the branch (`SKIP_CHANGELOG_CHECK=1` to override, discouraged).
-- **CI:** PR job **Changelog** runs [`scripts/check-changelog.sh`](./scripts/check-changelog.sh). Preview locally:
-
-```bash
-./scripts/check-changelog.sh origin/main HEAD
-```
-
-Optional escape in a commit subject (discouraged): `[skip changelog]`.
-
-### Pull requests
-
-New PRs use [`.github/PULL_REQUEST_TEMPLATE.md`](./.github/PULL_REQUEST_TEMPLATE.md): summary, changelog checkbox, change type, and test plan. Target **`main`** from a feature branch.
-
-More detail: [`CONTRIBUTING.md`](./CONTRIBUTING.md).
+Prefer **[Conventional Commits](https://www.conventionalcommits.org/)** (`feat(cli): …`, `fix(template): …`). For user-facing `feat` / `fix` / `perf`, add a bullet under **`## [Unreleased]`** in [`CHANGELOG.md`](./CHANGELOG.md) in the same PR.
 
 ## Continuous integration
 
-Workflow: [`.github/workflows/ci.yml`](./.github/workflows/ci.yml) — runs on **pull requests** and **pushes** to `main`.
+Workflow: [`.github/workflows/ci.yml`](./.github/workflows/ci.yml) — **pull requests** and **pushes** to `main`.
 
 | Job | Name (status check) | What it does |
 |-----|---------------------|--------------|
 | `changelog` | **Changelog** | PRs only: require `CHANGELOG.md` if commits/title are `feat` / `fix` / `perf` |
-| `rust` | **Rust (cli)** | `cargo fmt`, `clippy -D warnings`, `cargo llvm-cov` (fail under **80%** lines), release build, smoke `customfolio create --yes` |
-| `template` | **Next template** | `pnpm install --frozen-lockfile`, `typecheck`, `vitest` coverage (thresholds in `vitest.config.ts`), `build` |
+| `rust` | **Rust (cli)** | `cargo fmt`, `clippy -D warnings`, `cargo llvm-cov` (fail under **80%** lines), release build, smoke create |
+| `template` | **Next template** | `pnpm install`, typecheck, vitest coverage, build |
 
-## Branch protection
-
-`main` is protected (classic branch protection **and** a repository ruleset):
-
-| Rule | Setting |
-|------|---------|
-| Required status checks | **Rust (cli)**, **Next template**, **Changelog** (branch must be up to date with `main`) |
-| Enforce for admins | Yes |
-| Force push / delete `main` | Disabled |
-| Pull requests | Encouraged (review count may be `0`; still prefer PR workflow) |
-| Ruleset | [Protect main — require CI](https://github.com/srishjaiz/customDevFolio/rules/18207562) |
-
-Merge only when all required checks are **green**. Do not push directly to `main` for feature work.
+`main` is protected: required checks must be green; use a **feature branch + PR** (direct pushes to `main` are blocked). Ruleset: [Protect main — require CI](https://github.com/srishjaiz/customDevFolio/rules/18207562).
 
 ## Versioning and changelog history
 

@@ -1,17 +1,15 @@
 # <type>(<optional scope>): <short summary in imperative mood>
 #
+# Preferred (not blocking): Conventional Commits — CI does not enforce the subject.
 # Types: feat | fix | docs | style | refactor | perf | test | build | ci | chore | revert
 # Scopes (examples): cli | template | ci | docs
 #
-# - Subject ≤ 72 chars, no trailing period
-# - Blank line, then body wrapping at ~72 chars (why, not how)
-# - Footer: BREAKING CHANGE: …  or  Refs: #123
-#
-# Changelog: for feat/fix/perf/BREAKING, update CHANGELOG.md in the same commit or PR.
+# For feat/fix/perf: add a CHANGELOG.md bullet under ## [Unreleased] (CI checks this).
+# Before PR: make check
 #
 # Examples:
 #   feat(cli): support --domain ml non-interactive create
 #   fix(template): hide blog section when posts empty
-#   docs: add PR and commit message templates
+#   docs: simplify contributing flow
 #
 # ---- delete this comment block and write your message above ----
