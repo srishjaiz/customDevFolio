@@ -501,30 +501,191 @@ fn sample_tech(domain: DomainId) -> Vec<String> {
 mod tests {
     use super::*;
 
+    fn base_answers(domain: DomainId) -> CreateAnswers {
+        CreateAnswers {
+            project_name: "demo".into(),
+            domain,
+            display_name: "Test User".into(),
+            title: None,
+            bio: None,
+            location: None,
+            email: Some("t@example.com".into()),
+            github: Some("testuser".into()),
+            linkedin: None,
+            website: None,
+            resume_url: None,
+            primary_color: None,
+            theme_mode: ThemeMode::System,
+            include_sample_content: true,
+        }
+    }
+
     #[test]
     fn builds_config_for_each_domain() {
         for id in DomainId::ALL {
-            let cfg = CreateAnswers {
-                project_name: "demo".into(),
-                domain: id,
-                display_name: "Test User".into(),
-                title: None,
-                bio: None,
-                location: None,
-                email: Some("t@example.com".into()),
-                github: Some("testuser".into()),
-                linkedin: None,
-                website: None,
-                resume_url: None,
-                primary_color: None,
-                theme_mode: ThemeMode::System,
-                include_sample_content: true,
-            }
-            .into_portfolio();
+            let cfg = base_answers(id).into_portfolio();
             assert_eq!(cfg.domain, id);
             assert!(!cfg.person.name.is_empty());
+            assert_eq!(cfg.person.title, profile(id).default_title);
+            assert_eq!(cfg.theme.primary, profile(id).default_primary);
+            assert!(!cfg.skills.groups.is_empty());
+            assert_eq!(
+                cfg.skills.groups.len(),
+                profile(id).skill_group_hints.len()
+            );
+            assert!(!cfg.experience.is_empty());
+            assert_eq!(cfg.projects.len(), 2);
             let json = cfg.to_pretty_json().unwrap();
             assert!(json.contains("\"domain\""));
+            assert!(json.contains("https://github.com/testuser"));
         }
+    }
+
+    #[test]
+    fn list_profiles_covers_all_domains() {
+        let profiles = list_profiles();
+        assert_eq!(profiles.len(), DomainId::ALL.len());
+        for (p, id) in profiles.iter().zip(DomainId::ALL.iter()) {
+            assert_eq!(p.id, *id);
+            assert!(!p.label.is_empty());
+            assert!(!p.description.is_empty());
+            assert!(!p.default_title.is_empty());
+            assert!(p.default_primary.starts_with('#'));
+        }
+    }
+
+    #[test]
+    fn domain_section_defaults() {
+        assert!(!profile(DomainId::Backend).default_sections.blog);
+        assert!(!profile(DomainId::Backend).default_sections.achievements);
+        assert!(!profile(DomainId::Mobile).default_sections.blog);
+        assert!(!profile(DomainId::Data).default_sections.blog);
+        assert!(!profile(DomainId::Game).default_sections.blog);
+        assert!(profile(DomainId::Frontend).default_sections.blog);
+        assert!(profile(DomainId::Fullstack).default_sections.contact);
+    }
+
+    #[test]
+    fn sample_content_respects_section_flags() {
+        let backend = base_answers(DomainId::Backend).into_portfolio();
+        assert!(backend.achievements.is_empty());
+        assert!(backend.blog.posts.is_empty());
+        assert!(!backend.blog.enabled);
+
+        let frontend = base_answers(DomainId::Frontend).into_portfolio();
+        assert!(!frontend.achievements.is_empty());
+        assert!(!frontend.blog.posts.is_empty());
+        assert!(frontend.blog.enabled);
+    }
+
+    #[test]
+    fn minimal_content_path() {
+        let mut a = base_answers(DomainId::Ml);
+        a.include_sample_content = false;
+        let cfg = a.into_portfolio();
+        assert!(cfg.experience.is_empty());
+        assert!(cfg.education.is_empty());
+        assert!(cfg.achievements.is_empty());
+        assert!(cfg.blog.posts.is_empty());
+        assert!(!cfg.blog.enabled);
+        assert_eq!(cfg.projects.len(), 1);
+        assert!(cfg.projects[0].featured);
+        assert_eq!(cfg.skills.groups.len(), 2);
+        assert!(cfg.skills.groups[0].items[0].name.contains("skill"));
+    }
+
+    #[test]
+    fn custom_fields_override_defaults() {
+        let mut a = base_answers(DomainId::General);
+        a.title = Some("Staff Engineer".into());
+        a.bio = Some("Custom bio.".into());
+        a.primary_color = Some("#112233".into());
+        a.location = Some("Berlin".into());
+        a.linkedin = Some("https://linkedin.com/in/x".into());
+        a.website = Some("https://example.com".into());
+        a.resume_url = Some("https://example.com/cv.pdf".into());
+        a.theme_mode = ThemeMode::Dark;
+        let cfg = a.into_portfolio();
+        assert_eq!(cfg.person.title, "Staff Engineer");
+        assert_eq!(cfg.person.bio, "Custom bio.");
+        assert_eq!(cfg.theme.primary, "#112233");
+        assert_eq!(cfg.theme.mode, ThemeMode::Dark);
+        assert_eq!(cfg.person.location.as_deref(), Some("Berlin"));
+        assert_eq!(cfg.meta.site_url.as_deref(), Some("https://example.com"));
+        assert_eq!(
+            cfg.person.resume_url.as_deref(),
+            Some("https://example.com/cv.pdf")
+        );
+        assert_eq!(
+            cfg.social.linkedin.as_deref(),
+            Some("https://linkedin.com/in/x")
+        );
+        assert!(cfg.meta.title.contains("Staff Engineer"));
+        assert!(cfg.greeting.headline.contains("staff engineer"));
+    }
+
+    #[test]
+    fn empty_optional_fields_use_generated_bio() {
+        let mut a = base_answers(DomainId::Devops);
+        a.bio = Some("   ".into());
+        a.title = Some("".into());
+        a.email = Some("".into());
+        a.github = Some("".into());
+        a.primary_color = Some("".into());
+        let cfg = a.into_portfolio();
+        assert!(cfg.person.bio.contains("Test User"));
+        assert_eq!(cfg.person.title, profile(DomainId::Devops).default_title);
+        assert!(cfg.social.email.is_none());
+        assert!(cfg.social.github.is_none());
+        assert_eq!(
+            cfg.theme.primary,
+            profile(DomainId::Devops).default_primary
+        );
+    }
+
+    #[test]
+    fn normalize_github_variants() {
+        assert_eq!(
+            normalize_github(Some("alice".into())).as_deref(),
+            Some("https://github.com/alice")
+        );
+        assert_eq!(
+            normalize_github(Some("https://github.com/bob".into())).as_deref(),
+            Some("https://github.com/bob")
+        );
+        assert_eq!(
+            normalize_github(Some("http://github.com/carol".into())).as_deref(),
+            Some("http://github.com/carol")
+        );
+        assert_eq!(
+            normalize_github(Some("github.com/dave".into())).as_deref(),
+            Some("https://github.com/dave")
+        );
+        assert_eq!(
+            normalize_github(Some("www.github.com/eve".into())).as_deref(),
+            Some("https://github.com/eve")
+        );
+        assert!(normalize_github(None).is_none());
+        assert!(normalize_github(Some("  ".into())).is_none());
+    }
+
+    #[test]
+    fn sample_tech_per_domain_non_empty() {
+        for id in DomainId::ALL {
+            let tech = sample_tech(id);
+            assert_eq!(tech.len(), 3, "domain {id}");
+        }
+    }
+
+    #[test]
+    fn minimal_project_links_github_when_set() {
+        let mut a = base_answers(DomainId::Security);
+        a.include_sample_content = false;
+        a.github = Some("secdev".into());
+        let cfg = a.into_portfolio();
+        assert_eq!(
+            cfg.projects[0].repo_url.as_deref(),
+            Some("https://github.com/secdev")
+        );
     }
 }

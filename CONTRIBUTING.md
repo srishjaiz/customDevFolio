@@ -75,8 +75,9 @@ Opening a PR loads [`.github/PULL_REQUEST_TEMPLATE.md`](./.github/PULL_REQUEST_T
 cargo fmt --all -- --check
 cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace
+# CI also runs: cargo llvm-cov --workspace --fail-under-lines 80
 # if you touched template/
-cd template && pnpm typecheck && pnpm build
+cd template && pnpm typecheck && pnpm test && pnpm test:coverage && pnpm build
 ```
 
 ## CI changelog check

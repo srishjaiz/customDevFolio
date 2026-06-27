@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Expanded CLI unit and integration tests (`config`, `domain`, `scaffold`, `prompts`, `cli`, `cli_smoke`) for high coverage of domain presets, scaffolding, and flag parsing.
+- Template unit tests with Vitest (`template/lib/*.test.ts`) covering `utils`, `domains`, and `portfolio` helpers; `pnpm test` / `pnpm test:coverage` scripts.
+- CI: Rust job runs `cargo llvm-cov` with an 80% line-coverage gate; template job runs Vitest with coverage thresholds; coverage artifacts uploaded on PRs/pushes.
 - Pull request template (`.github/PULL_REQUEST_TEMPLATE.md`) with summary, changelog, and test-plan sections.
 - Commit message template (`.gitmessage`) and contributor setup script (`scripts/setup-git.sh`).
 - Git hooks (`.githooks/`): Conventional Commits on `commit-msg`, changelog reminder on `pre-push` for `feat`/`fix`/`perf`.
