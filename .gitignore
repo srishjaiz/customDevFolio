@@ -1,0 +1,20 @@
+# Rust
+/target/
+**/*.rs.bk
+Cargo.lock.bak
+
+# Node (template artifacts; lockfile is committed under template/)
+template/node_modules/
+template/.next/
+template/out/
+template/tsconfig.tsbuildinfo
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Local scaffold demos (not part of the product)
+/my-fe-folio/
+/cf-demo/

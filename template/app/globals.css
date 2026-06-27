@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+/* Brand tokens — primary is injected from portfolio theme on <html> via style. */
+:root {
+  --background: #fafafa;
+  --foreground: #0a0a0a;
+  --muted: #737373;
+  --card: #ffffff;
+  --card-border: #e5e5e5;
+  --primary: #6366f1;
+  --primary-foreground: #ffffff;
+  --ring: color-mix(in srgb, var(--primary) 35%, transparent);
+  --section-alt: #f4f4f5;
+}
+
+.dark {
+  --background: #0a0a0a;
+  --foreground: #fafafa;
+  --muted: #a3a3a3;
+  --card: #171717;
+  --card-border: #262626;
+  --primary-foreground: #0a0a0a;
+  --section-alt: #111111;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-card: var(--card);
+  --color-card-border: var(--card-border);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-section-alt: var(--section-alt);
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background: color-mix(in srgb, var(--primary) 35%, transparent);
+}
+
+.section-pad {
+  @apply px-4 sm:px-6 lg:px-8 py-16 sm:py-20;
+}
+
+.container-narrow {
+  @apply mx-auto w-full max-w-5xl;
+}
+
+.card-surface {
+  @apply rounded-2xl border border-card-border bg-card shadow-sm;
+}

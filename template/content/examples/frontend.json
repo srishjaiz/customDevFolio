@@ -1,0 +1,127 @@
+{
+  "meta": {
+    "title": "Riley Nguyen — Frontend Engineer",
+    "description": "Frontend engineer specializing in design systems and accessible web apps.",
+    "siteUrl": "https://example.dev"
+  },
+  "domain": "frontend",
+  "person": {
+    "name": "Riley Nguyen",
+    "title": "Frontend Engineer",
+    "bio": "I craft fast, accessible interfaces and the design systems that keep teams consistent.",
+    "location": "Berlin, DE",
+    "resumeUrl": "#"
+  },
+  "social": {
+    "github": "https://github.com",
+    "linkedin": "https://linkedin.com",
+    "dribbble": "https://dribbble.com",
+    "email": "riley@example.dev"
+  },
+  "greeting": {
+    "headline": "Frontend engineer focused on craft, a11y, and design systems.",
+    "subheadline": "React, TypeScript, and careful motion—performance included.",
+    "ctaLabel": "View UI work",
+    "ctaHref": "#projects"
+  },
+  "skills": {
+    "title": "Skills",
+    "groups": [
+      {
+        "name": "Languages & frameworks",
+        "items": [
+          { "name": "TypeScript", "level": 92 },
+          { "name": "React", "level": 94 },
+          { "name": "Next.js", "level": 86 }
+        ]
+      },
+      {
+        "name": "Styling & design",
+        "items": [
+          { "name": "CSS / Tailwind", "level": 90 },
+          { "name": "Figma", "level": 80 },
+          { "name": "Design tokens", "level": 85 }
+        ]
+      },
+      {
+        "name": "Quality",
+        "items": [
+          { "name": "Testing Library", "level": 84 },
+          { "name": "Storybook", "level": 82 },
+          { "name": "a11y audits", "level": 88 }
+        ]
+      }
+    ]
+  },
+  "experience": [
+    {
+      "role": "Frontend Engineer",
+      "company": "Lattice UI",
+      "startDate": "2021",
+      "endDate": "Present",
+      "description": "Own design system packages and high-traffic marketing surfaces.",
+      "highlights": [
+        "Published component library used across 5 products",
+        "Improved Lighthouse accessibility scores to 95+ sitewide"
+      ],
+      "tech": ["React", "TypeScript", "Storybook"]
+    }
+  ],
+  "education": [
+    {
+      "school": "Design & Tech College",
+      "degree": "B.A.",
+      "field": "Interactive Media",
+      "endDate": "2019"
+    }
+  ],
+  "projects": [
+    {
+      "title": "Prism DS",
+      "description": "Token-driven React component library with dark mode and RTL support.",
+      "tags": ["React", "Design system", "a11y"],
+      "demoUrl": "https://example.com",
+      "repoUrl": "https://github.com",
+      "featured": true
+    },
+    {
+      "title": "Motion Cookbook",
+      "description": "Accessible animation patterns for product UI (reduced-motion aware).",
+      "tags": ["CSS", "Framer Motion", "a11y"],
+      "repoUrl": "https://github.com",
+      "featured": true
+    }
+  ],
+  "achievements": [
+    {
+      "title": "WebAIM training",
+      "date": "2024"
+    }
+  ],
+  "blog": {
+    "enabled": true,
+    "title": "Writing",
+    "posts": [
+      {
+        "title": "Tokens before components",
+        "url": "https://example.dev/blog/tokens",
+        "date": "2025-08"
+      }
+    ]
+  },
+  "contact": {
+    "title": "Say hello",
+    "subtitle": "Available for frontend and design-systems roles.",
+    "email": "riley@example.dev"
+  },
+  "theme": { "primary": "#ec4899", "mode": "system" },
+  "sections": {
+    "skills": true,
+    "experience": true,
+    "projects": true,
+    "education": true,
+    "achievements": true,
+    "blog": true,
+    "contact": true
+  }
+}
