@@ -18,3 +18,8 @@ template/tsconfig.tsbuildinfo
 # Local scaffold demos (not part of the product)
 /my-fe-folio/
 /cf-demo/
+
+# Test / coverage artifacts
+template/coverage/
+/lcov.info
+/coverage/

@@ -7,8 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Contributor DX:** `make check` is the single local entrypoint (auto-configures commit template + hooks); git hooks are advisory only; CI remains the hard gate. Shorter `CONTRIBUTING.md` and PR template; no mandatory `./scripts/setup-git.sh` step.
+
 ### Added
 
+- `Makefile` and `scripts/check.sh` / `scripts/ensure-git-setup.sh` for one-command local validation aligned with CI (without requiring `cargo-llvm-cov` locally).
 - Expanded CLI unit and integration tests (`config`, `domain`, `scaffold`, `prompts`, `cli`, `cli_smoke`) for high coverage of domain presets, scaffolding, and flag parsing.
 - Template unit tests with Vitest (`template/lib/*.test.ts`) covering `utils`, `domains`, and `portfolio` helpers; `pnpm test` / `pnpm test:coverage` scripts.
 - CI: Rust job runs `cargo llvm-cov` with an 80% line-coverage gate; template job runs Vitest with coverage thresholds; coverage artifacts uploaded on PRs/pushes.

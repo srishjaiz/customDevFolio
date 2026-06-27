@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
-# Block push if feat/fix/perf commits since upstream main lack a CHANGELOG.md update on the branch.
+# Advisory changelog reminder (does not block). PR CI job "Changelog" still enforces this.
 set -euo pipefail
 
 ROOT="$(git rev-parse --show-toplevel)"
 cd "$ROOT"
 
 remote="${1:-origin}"
-# Determine range: remote main..HEAD if main exists, else nothing
 if git rev-parse --verify "$remote/main" >/dev/null 2>&1; then
   RANGE="$remote/main..HEAD"
 elif git rev-parse --verify main >/dev/null 2>&1; then
@@ -15,11 +14,10 @@ else
   exit 0
 fi
 
-# Commits that typically need changelog entries
 needs_changelog=0
 while IFS= read -r line; do
   [[ -z "$line" ]] && continue
-  if [[ "$line" =~ ^(feat|fix|perf)(\(|!|:|$) ]] || [[ "$line" == *'!'*:* ]]; then
+  if [[ "$line" =~ ^(feat|fix|perf)(\(|!|:|$) ]]; then
     needs_changelog=1
     break
   fi
@@ -29,28 +27,21 @@ if [[ "$needs_changelog" -eq 0 ]]; then
   exit 0
 fi
 
-# Did any commit on the branch touch CHANGELOG.md?
 if git log --format='%H' "$RANGE" -- CHANGELOG.md | grep -q .; then
   exit 0
 fi
 
-# Or is CHANGELOG staged/unstaged ahead of main? (working tree not pushed — still require it in history)
 if git diff --name-only "$RANGE" -- CHANGELOG.md | grep -q .; then
   exit 0
 fi
 
 cat >&2 <<'ERR'
-pre-push: this branch has feat/fix/perf commits but CHANGELOG.md was not updated.
+pre-push: tip — this branch has feat/fix/perf commits but CHANGELOG.md was not updated.
 
-  Update CHANGELOG.md (e.g. under ## [Unreleased] or the next version), commit it, then push.
+  Add a bullet under ## [Unreleased] in CHANGELOG.md before opening the PR
+  (CI "Changelog" job will fail the PR otherwise).
 
-  Skip only if you truly must (not recommended):
-    SKIP_CHANGELOG_CHECK=1 git push
+  (advisory only — push proceeds)
 ERR
 
-if [[ "${SKIP_CHANGELOG_CHECK:-}" == "1" ]]; then
-  echo "pre-push: SKIP_CHANGELOG_CHECK=1 set; allowing push." >&2
-  exit 0
-fi
-
-exit 1
+exit 0
