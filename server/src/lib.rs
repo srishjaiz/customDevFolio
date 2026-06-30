@@ -1,11 +1,10 @@
-//! Postgres-backed storage for customFolio accounts and portfolios.
-//!
+//! Postgres-backed storage and HTTP API for customFolio.
 //! Free / OSS stack only — see `docs/adr/0001-free-stack.md`.
-//! Phase 1: schema migrations + repositories.
-//! Phase 3: stream NDJSON → upsert portfolios.
 
+pub mod auth;
 pub mod db;
 pub mod error;
+pub mod http;
 pub mod import;
 pub mod models;
 pub mod repos;
