@@ -1,0 +1,15 @@
+# Free multi-stage build for customfolio-api (Phase 7 optional).
+FROM rust:1.85-bookworm AS builder
+WORKDIR /app
+COPY Cargo.toml Cargo.lock ./
+COPY cli ./cli
+COPY server ./server
+RUN cargo build --release -p customfolio-server --bin customfolio-api
+
+FROM debian:bookworm-slim
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && rm -rf /var/lib/apt/lists/*
+COPY --from=builder /app/target/release/customfolio-api /usr/local/bin/customfolio-api
+ENV HOST=0.0.0.0 PORT=8080 DATA_DIR=/data/imports
+RUN mkdir -p /data/imports
+EXPOSE 8080
+CMD ["customfolio-api"]

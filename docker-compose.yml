@@ -1,8 +1,8 @@
-# Free / self-hosted dependencies for local development (Phase 0–1).
-# Usage:
+# Free / self-hosted stack for local development (Phases 0–7).
 #   docker compose up -d postgres
 #   export DATABASE_URL=postgres://customfolio:customfolio@localhost:5432/customfolio
-#   cargo test -p customfolio-server
+#   cargo run -p customfolio-server --bin customfolio-api
+# Optional full stack: docker compose up -d  (builds api image if Dockerfile present)
 
 services:
   postgres:
@@ -23,5 +23,26 @@ services:
       timeout: 5s
       retries: 10
 
+  api:
+    profiles: ["full"]
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    ports:
+      - "8080:8080"
+    environment:
+      DATABASE_URL: postgres://customfolio:customfolio@postgres:5432/customfolio
+      HOST: 0.0.0.0
+      PORT: "8080"
+      DATA_DIR: /data/imports
+      MAX_UPLOAD_BYTES: "52428800"
+      CORS_ORIGIN: http://localhost:3000
+    volumes:
+      - customfolio_imports:/data/imports
+    depends_on:
+      postgres:
+        condition: service_healthy
+
 volumes:
   customfolio_pgdata:
+  customfolio_imports:
