@@ -24,6 +24,39 @@ pub enum Commands {
     Domains,
     /// Stream a portfolio CSV to NDJSON on disk (large-file safe)
     CsvToNdjson(CsvToNdjsonArgs),
+    /// Convert CSV→NDJSON on disk, then stream NDJSON into Postgres (Phase 3)
+    ImportDb(ImportDbArgs),
+}
+
+#[derive(Debug, clap::Args)]
+pub struct ImportDbArgs {
+    /// Portfolio CSV path (always converted to NDJSON on disk first)
+    #[arg(long)]
+    pub csv: PathBuf,
+
+    /// Account UUID that will own imported portfolios
+    #[arg(long)]
+    pub account_id: String,
+
+    /// User UUID recorded on the import job (must own or operate the account)
+    #[arg(long)]
+    pub user_id: String,
+
+    /// Postgres URL (or set DATABASE_URL)
+    #[arg(long, env = "DATABASE_URL")]
+    pub database_url: String,
+
+    /// Working directory for intermediate NDJSON / errors (default: data/imports/<job-id>)
+    #[arg(long)]
+    pub work_dir: Option<PathBuf>,
+
+    /// Include domain sample content when converting CSV
+    #[arg(long)]
+    pub sample: bool,
+
+    /// Continue after row errors
+    #[arg(long)]
+    pub continue_on_error: bool,
 }
 
 #[derive(Debug, clap::Args)]
@@ -176,7 +209,9 @@ mod tests {
                 assert!(args.domain.is_none());
                 assert!(matches!(args.theme, ThemeModeArg::System));
             }
-            Commands::Domains | Commands::CsvToNdjson(_) => panic!("expected create"),
+            Commands::Domains | Commands::CsvToNdjson(_) | Commands::ImportDb(_) => {
+                panic!("expected create")
+            }
         }
     }
 
@@ -245,7 +280,9 @@ mod tests {
                 assert!(args.git);
                 assert!(args.minimal);
             }
-            Commands::Domains | Commands::CsvToNdjson(_) => panic!("expected create"),
+            Commands::Domains | Commands::CsvToNdjson(_) | Commands::ImportDb(_) => {
+                panic!("expected create")
+            }
         }
     }
 
