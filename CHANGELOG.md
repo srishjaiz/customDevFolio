@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Import test fixtures: `examples/import/edge_cases.csv` (breaking/edge rows) and `scripts/generate_portfolio_csv.py` for large mixed CSVs (e.g. 10k/100k).
 - End-to-end multi-portfolio docs: [`docs/multi-portfolio.md`](./docs/multi-portfolio.md), [`docs/README.md`](./docs/README.md); README reorganized for `main` vs `feature/multi-portfolio-builder` and how-to use.
 - **Phase 7 — Hardening / ops:** `Dockerfile.api`, compose `api` profile, `docs/ops.md` (env, upload limits, import cleanup), credentialed CORS via `CORS_ORIGIN`.
 - **Phase 6 — Browser UI:** Next.js `/login`, `/signup`, `/dashboard` with account list, CSV upload, and portfolio detail from API (`NEXT_PUBLIC_API_URL`).

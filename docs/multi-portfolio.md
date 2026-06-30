@@ -79,7 +79,11 @@ NEXT_PUBLIC_API_URL=http://localhost:8080 pnpm dev
 | Upload | Choose a **CSV** file → **Upload CSV** (multipart to API; converts on disk then imports) |
 | Portfolio | Click a person → view portfolio payload / details |
 
-Sample CSV: [`examples/import/people.csv`](../examples/import/people.csv).
+Sample CSVs:
+
+- Happy path: [`examples/import/people.csv`](../examples/import/people.csv)
+- Edge + breaking rows: [`examples/import/edge_cases.csv`](../examples/import/edge_cases.csv) (use `--continue-on-error`)
+- Large synthetic data: `python3 scripts/generate_portfolio_csv.py -n 10000 --breaking 0.02 -o examples/import/generated/large_10k_mixed.csv`
 
 ### 5. Log out
 
