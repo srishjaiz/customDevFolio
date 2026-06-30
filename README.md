@@ -23,6 +23,7 @@ Configure once via prompts or flags → scaffold a ready-to-run app → keep cus
 | **Multi-account Phase 3 — NDJSON → DB** | Done | `customfolio import-db` + `server::import_ndjson_file` |
 | **Multi-account Phase 4 — Auth API** | Done | `customfolio-api` signup/login/sessions/accounts |
 | **Multi-account Phase 5 — CSV upload API** | Done | `POST /accounts/{id}/imports` multipart upload |
+| **Multi-account Phase 6 — Browser UI** | Done | template login/dashboard + upload from DB API |
 | **Contributor workflow** | Done | PR template, commit hooks, changelog CI |
 | **Branch protection** | Active on `main` | Required CI checks (see below) |
 
