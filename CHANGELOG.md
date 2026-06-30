@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Phase 2 — CSV → NDJSON (streaming):** `customfolio csv-to-ndjson <csv> -o <ndjson>` streams large CSVs to on-disk NDJSON (one portfolio + `slug` per line) using free `csv` + `serde_json` crates—never loads the full file as one array. Flags: `--sample`, `--continue-on-error`, `--errors`. Example: [`examples/import/people.csv`](./examples/import/people.csv).
 - **Phase 0 — free stack ADR & layout:** [`docs/adr/0001-free-stack.md`](./docs/adr/0001-free-stack.md) documents OSS-only choices (Postgres, SQLx, local disk imports, no paid auth/SaaS); [`docker-compose.yml`](./docker-compose.yml) for PostgreSQL 16; `data/imports/` for future CSV/NDJSON; `.env.example` with `DATABASE_URL`.
 - **Phase 1 — Postgres storage (`server/` / `customfolio-server`):** SQLx migrations for `users`, `accounts`, `portfolios` (JSONB `config`), `import_jobs`, `sessions`; repositories for create/list/get/upsert by `(account_id, slug)`; integration tests when `DATABASE_URL` is set.
 - `Makefile` and `scripts/check.sh` / `scripts/ensure-git-setup.sh` for one-command local validation aligned with CI (without requiring `cargo-llvm-cov` locally).

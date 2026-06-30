@@ -1,0 +1,4 @@
+slug,domain,name,title,bio,location,email,github,linkedin,website,resume_url,primary,theme
+ada-lovelace,frontend,Ada Lovelace,Frontend Engineer,Building accessible UI systems.,London,ada@example.com,ada,https://linkedin.com/in/ada,https://ada.dev,https://ada.dev/cv.pdf,#ec4899,system
+grace-hopper,backend,Grace Hopper,Backend Engineer,APIs and reliable services.,Remote,grace@example.com,grace,https://linkedin.com/in/grace,https://grace.dev,,#3b82f6,dark
+alan-turing,ml,Alan Turing,ML Engineer,Models and evaluation.,Cambridge,alan@example.com,alan,,,https://alan.dev/resume.pdf,#0d9488,system

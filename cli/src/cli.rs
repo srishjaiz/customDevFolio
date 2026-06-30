@@ -22,6 +22,30 @@ pub enum Commands {
     Create(Box<CreateArgs>),
     /// List supported SWE domains and defaults
     Domains,
+    /// Stream a portfolio CSV to NDJSON on disk (large-file safe)
+    CsvToNdjson(CsvToNdjsonArgs),
+}
+
+#[derive(Debug, clap::Args)]
+pub struct CsvToNdjsonArgs {
+    /// Input CSV path (header row required)
+    pub input: PathBuf,
+
+    /// Output NDJSON path (one portfolio JSON object per line)
+    #[arg(short = 'o', long)]
+    pub output: PathBuf,
+
+    /// Include domain sample experience/projects (default: minimal placeholders only)
+    #[arg(long)]
+    pub sample: bool,
+
+    /// Continue after row errors; write remaining good rows
+    #[arg(long)]
+    pub continue_on_error: bool,
+
+    /// Write per-row errors as NDJSON (`{"line", "error"}`)
+    #[arg(long)]
+    pub errors: Option<PathBuf>,
 }
 
 #[derive(Debug, Clone, Copy, ValueEnum)]
@@ -152,7 +176,7 @@ mod tests {
                 assert!(args.domain.is_none());
                 assert!(matches!(args.theme, ThemeModeArg::System));
             }
-            Commands::Domains => panic!("expected create"),
+            Commands::Domains | Commands::CsvToNdjson(_) => panic!("expected create"),
         }
     }
 
@@ -221,7 +245,7 @@ mod tests {
                 assert!(args.git);
                 assert!(args.minimal);
             }
-            Commands::Domains => panic!("expected create"),
+            Commands::Domains | Commands::CsvToNdjson(_) => panic!("expected create"),
         }
     }
 
@@ -229,6 +253,35 @@ mod tests {
     fn cli_parses_domains_subcommand() {
         let cli = Cli::try_parse_from(["customfolio", "domains"]).unwrap();
         assert!(matches!(cli.command, Commands::Domains));
+    }
+
+    #[test]
+    fn cli_parses_csv_to_ndjson() {
+        let cli = Cli::try_parse_from([
+            "customfolio",
+            "csv-to-ndjson",
+            "in.csv",
+            "-o",
+            "out.ndjson",
+            "--sample",
+            "--continue-on-error",
+            "--errors",
+            "err.ndjson",
+        ])
+        .unwrap();
+        match cli.command {
+            Commands::CsvToNdjson(args) => {
+                assert_eq!(args.input, PathBuf::from("in.csv"));
+                assert_eq!(args.output, PathBuf::from("out.ndjson"));
+                assert!(args.sample);
+                assert!(args.continue_on_error);
+                assert_eq!(
+                    args.errors.as_deref(),
+                    Some(std::path::Path::new("err.ndjson"))
+                );
+            }
+            _ => panic!("expected csv-to-ndjson"),
+        }
     }
 
     #[test]
