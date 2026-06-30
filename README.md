@@ -100,7 +100,8 @@ cd my-portfolio && pnpm install && pnpm dev
 | Browser dashboard | Done | `template/app/login`, `signup`, `dashboard` |
 | Ops / Docker API | Done | [`Dockerfile.api`](./Dockerfile.api), [`docs/ops.md`](./docs/ops.md) |
 | Contributor workflow | Done | PR template, hooks, changelog CI |
-| Branch protection on **`main`** | Active | Required CI; multi-portfolio lives on **feature branch** until you choose to merge |
+| Branch protection on **`main`** | Active | Required CI (Rust, Next template, Changelog) |
+| Branch protection on **`feature/multi-portfolio-builder`** | Active | Same required checks; PRs required — multi-portfolio integration line |
 
 ## CLI commands
 
@@ -279,7 +280,7 @@ Prefer **[Conventional Commits](https://www.conventionalcommits.org/)**. For use
 
 ## Continuous integration
 
-[`.github/workflows/ci.yml`](./.github/workflows/ci.yml) on PRs / pushes to `main` (Rust job uses a Postgres service when present on the branch).
+[`.github/workflows/ci.yml`](./.github/workflows/ci.yml) on PRs / pushes to **`main`** and **`feature/multi-portfolio-builder`** (Rust job uses a Postgres service for server integration tests).
 
 | Job | Check name | What it does |
 |-----|------------|--------------|
@@ -287,7 +288,14 @@ Prefer **[Conventional Commits](https://www.conventionalcommits.org/)**. For use
 | `rust` | **Rust (cli)** | fmt, clippy, llvm-cov (≥80% lines), release smoke |
 | `template` | **Next template** | typecheck, vitest coverage, build |
 
-`main` stays protected and free of multi-portfolio merges until you intentionally open a PR from `feature/multi-portfolio-builder` → `main`.
+**Branch protection** (GitHub):
+
+| Branch | Rules (summary) |
+|--------|------------------|
+| **`main`** | PR required; status checks **Rust (cli)**, **Next template**, **Changelog**; no force-push; enforce for admins |
+| **`feature/multi-portfolio-builder`** | Same required checks and PR gate — integrate multi-portfolio work via PRs into this branch, not direct pushes |
+
+Classic single-portfolio baseline remains on **`main`**. Multi-portfolio integration line is **`feature/multi-portfolio-builder`** (protected). Merging that feature into `main` is intentional and separate.
 
 ## Versioning and changelog
 
