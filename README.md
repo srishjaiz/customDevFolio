@@ -20,6 +20,7 @@ Configure once via prompts or flags → scaffold a ready-to-run app → keep cus
 | **Multi-account (free stack) Phase 0** | Done | [`docs/adr/0001-free-stack.md`](./docs/adr/0001-free-stack.md), [`docker-compose.yml`](./docker-compose.yml) |
 | **Multi-account Phase 1 — Postgres + repos** | Done | [`server/`](./server/) (`customfolio-server`) |
 | **Multi-account Phase 2 — CSV → NDJSON** | Done | `customfolio csv-to-ndjson` (streaming, on-disk intermediate) |
+| **Multi-account Phase 3 — NDJSON → DB** | Done | `customfolio import-db` + `server::import_ndjson_file` |
 | **Contributor workflow** | Done | PR template, commit hooks, changelog CI |
 | **Branch protection** | Active on `main` | Required CI checks (see below) |
 
