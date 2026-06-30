@@ -244,3 +244,35 @@ fn version_flag_works() {
         .success()
         .stdout(predicate::str::contains("customfolio"));
 }
+
+#[test]
+fn csv_to_ndjson_streams_example_shape() {
+    let dir = tempdir().unwrap();
+    let csv = dir.path().join("people.csv");
+    let ndjson = dir.path().join("people.ndjson");
+    fs::write(
+        &csv,
+        "slug,domain,name,title,email\n\
+         ada-lovelace,frontend,Ada Lovelace,Frontend Engineer,ada@example.com\n\
+         grace-hopper,backend,Grace Hopper,Backend Engineer,grace@example.com\n",
+    )
+    .unwrap();
+
+    cargo_bin_cmd!("customfolio")
+        .args([
+            "csv-to-ndjson",
+            csv.to_str().unwrap(),
+            "-o",
+            ndjson.to_str().unwrap(),
+        ])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("Conversion complete"))
+        .stdout(predicate::str::contains("succeeded: 2"));
+
+    let text = fs::read_to_string(&ndjson).unwrap();
+    let lines: Vec<_> = text.lines().filter(|l| !l.is_empty()).collect();
+    assert_eq!(lines.len(), 2);
+    assert!(lines[0].contains("\"slug\":\"ada-lovelace\""));
+    assert!(lines[0].contains("\"domain\":\"frontend\""));
+}

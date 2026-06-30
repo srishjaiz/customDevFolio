@@ -19,6 +19,7 @@ Configure once via prompts or flags → scaffold a ready-to-run app → keep cus
 | **2–3 — Rust CLI** | Done | [`cli/`](./cli/) (`customfolio`) |
 | **Multi-account (free stack) Phase 0** | Done | [`docs/adr/0001-free-stack.md`](./docs/adr/0001-free-stack.md), [`docker-compose.yml`](./docker-compose.yml) |
 | **Multi-account Phase 1 — Postgres + repos** | Done | [`server/`](./server/) (`customfolio-server`) |
+| **Multi-account Phase 2 — CSV → NDJSON** | Done | `customfolio csv-to-ndjson` (streaming, on-disk intermediate) |
 | **Contributor workflow** | Done | PR template, commit hooks, changelog CI |
 | **Branch protection** | Active on `main` | Required CI checks (see below) |
 
@@ -54,7 +55,26 @@ Ongoing edits: **`content/portfolio.json`** (same schema as the in-repo template
 |---------|-------------|
 | `customfolio create [name]` | Scaffold app — interactive on TTY, or use flags + `--yes` |
 | `customfolio domains` | Print domain ids, labels, and short descriptions |
+| `customfolio csv-to-ndjson <csv> -o <ndjson>` | Stream large portfolio CSV → NDJSON on disk (Phase 2) |
 | `customfolio --help` | Full flag reference |
+
+### CSV → NDJSON (large datasets)
+
+Converts a **CSV** of portfolio rows to **NDJSON** by streaming (row-by-row). Output is written to disk as an intermediate for later DB import (Phase 3)—it does **not** load the entire CSV into RAM as one list.
+
+```bash
+customfolio csv-to-ndjson examples/import/people.csv -o /tmp/people.ndjson
+customfolio csv-to-ndjson people.csv -o people.ndjson --continue-on-error --errors errors.ndjson
+```
+
+| Flag | Purpose |
+|------|---------|
+| `-o, --output` | NDJSON output path (required) |
+| `--sample` | Include domain sample experience/projects |
+| `--continue-on-error` | Skip bad rows instead of failing the run |
+| `--errors <path>` | Write `{"line","error"}` NDJSON for failed rows |
+
+Column reference: [`examples/import/README.md`](./examples/import/README.md).
 
 ### Useful `create` flags
 
