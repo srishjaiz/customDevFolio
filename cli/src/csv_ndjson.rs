@@ -151,10 +151,7 @@ fn write_row_error(
 
 /// Normalize header names to a small canonical set.
 fn normalize_header(raw: &str) -> String {
-    let s = raw
-        .trim()
-        .to_ascii_lowercase()
-        .replace(['-', ' '], "_");
+    let s = raw.trim().to_ascii_lowercase().replace(['-', ' '], "_");
     match s.as_str() {
         "full_name" | "fullname" | "person_name" | "displayname" | "display_name" => "name".into(),
         "primary_color" | "primarycolor" | "color" => "primary".into(),

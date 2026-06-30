@@ -235,3 +235,81 @@ async fn user_account_job_session_roundtrip() {
         .await
         .is_err());
 }
+
+
+#[tokio::test]
+async fn import_ndjson_upserts_portfolios() {
+    let Some(pool) = setup_pool().await else {
+        eprintln!("skipping: DATABASE_URL not set");
+        return;
+    };
+
+    use customfolio_server::import_ndjson_file;
+    use std::io::Write;
+    use tempfile::tempdir;
+
+    let users = UserRepo::new(&pool);
+    let accounts = AccountRepo::new(&pool);
+    let portfolios = PortfolioRepo::new(&pool);
+
+    let suffix = Uuid::new_v4().simple().to_string();
+    let user = users
+        .create(&NewUser {
+            email: format!("import-{suffix}@example.com"),
+            password_hash: None,
+            display_name: None,
+        })
+        .await
+        .unwrap();
+    let account = accounts
+        .create(&NewAccount {
+            owner_user_id: user.id,
+            name: "Import Acc".into(),
+            slug: format!("imp-{suffix}"),
+            description: None,
+            default_theme: None,
+        })
+        .await
+        .unwrap();
+
+    let dir = tempdir().unwrap();
+    let ndjson = dir.path().join("data.ndjson");
+    let line = serde_json::json!({
+        "slug": "ada-lovelace",
+        "domain": "frontend",
+        "person": { "name": "Ada Lovelace", "title": "FE", "bio": "x" },
+        "meta": { "title": "t", "description": "d" },
+        "social": {},
+        "greeting": { "headline": "h", "subheadline": "s" },
+        "skills": { "title": "Skills", "groups": [] },
+        "experience": [],
+        "education": [],
+        "projects": [],
+        "achievements": [],
+        "blog": { "enabled": false, "posts": [] },
+        "contact": { "title": "C" },
+        "theme": { "primary": "#ec4899", "mode": "system" },
+        "sections": {
+            "skills": true,
+            "experience": true,
+            "projects": true,
+            "education": true,
+            "achievements": true,
+            "blog": false,
+            "contact": true
+        }
+    });
+    let mut f = std::fs::File::create(&ndjson).unwrap();
+    writeln!(f, "{}", line).unwrap();
+
+    let stats = import_ndjson_file(&pool, account.id, &ndjson, None, false, None)
+        .await
+        .unwrap();
+    assert_eq!(stats.succeeded, 1);
+
+    let got = portfolios
+        .get_by_account_and_slug(account.id, "ada-lovelace")
+        .await
+        .unwrap();
+    assert_eq!(got.person_name, "Ada Lovelace");
+}

@@ -15,6 +15,9 @@ pub enum RepoError {
 
     #[error(transparent)]
     Sqlx(#[from] sqlx::Error),
+
+    #[error(transparent)]
+    Io(#[from] std::io::Error),
 }
 
 impl RepoError {
