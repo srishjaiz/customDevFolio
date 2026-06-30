@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main, master]
+    branches: [main, master, feature/multi-portfolio-builder]
   pull_request:
-    branches: [main, master]
+    branches: [main, master, feature/multi-portfolio-builder]
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -36,6 +36,22 @@ jobs:
   rust:
     name: Rust (cli)
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: customfolio
+          POSTGRES_PASSWORD: customfolio
+          POSTGRES_DB: customfolio
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U customfolio -d customfolio"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgres://customfolio:customfolio@localhost:5432/customfolio
     steps:
       - uses: actions/checkout@v4
 
