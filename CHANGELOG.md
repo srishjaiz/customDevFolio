@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Phase 5 — Manual CSV upload:** authenticated `POST /accounts/{id}/imports` (multipart) writes CSV to disk, streams to NDJSON, imports to Postgres; `GET /imports/{job_id}` for status.
 - **Phase 4 — Auth API:** `customfolio-api` (Axum) with signup/login/logout/me (argon2 + httpOnly session cookies), create/list accounts, list/get portfolios for owners.
 - **Phase 3 — NDJSON → Postgres:** `customfolio import-db` always converts CSV→NDJSON on disk then streams NDJSON into portfolios (upsert by account+slug); `server` `import_ndjson_file` + import job updates.
 - **Phase 2 — CSV → NDJSON (streaming):** `customfolio csv-to-ndjson <csv> -o <ndjson>` streams large CSVs to on-disk NDJSON (one portfolio + `slug` per line) using free `csv` + `serde_json` crates—never loads the full file as one array. Flags: `--sample`, `--continue-on-error`, `--errors`. Example: [`examples/import/people.csv`](./examples/import/people.csv).

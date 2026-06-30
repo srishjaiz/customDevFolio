@@ -2,6 +2,7 @@
 //! Free / OSS stack only — see `docs/adr/0001-free-stack.md`.
 
 pub mod auth;
+pub mod csv_convert;
 pub mod db;
 pub mod error;
 pub mod http;
