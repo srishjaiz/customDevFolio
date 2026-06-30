@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Phase 6 — Browser UI:** Next.js `/login`, `/signup`, `/dashboard` with account list, CSV upload, and portfolio detail from API (`NEXT_PUBLIC_API_URL`).
 - **Phase 5 — Manual CSV upload:** authenticated `POST /accounts/{id}/imports` (multipart) writes CSV to disk, streams to NDJSON, imports to Postgres; `GET /imports/{job_id}` for status.
 - **Phase 4 — Auth API:** `customfolio-api` (Axum) with signup/login/logout/me (argon2 + httpOnly session cookies), create/list accounts, list/get portfolios for owners.
 - **Phase 3 — NDJSON → Postgres:** `customfolio import-db` always converts CSV→NDJSON on disk then streams NDJSON into portfolios (upsert by account+slug); `server` `import_ndjson_file` + import job updates.

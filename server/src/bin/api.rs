@@ -35,11 +35,13 @@ async fn main() -> anyhow::Result<()> {
     migrate(&pool).await?;
 
     let state = AppState::new(pool, data_dir, max_upload_bytes);
+    let cors_origin = env::var("CORS_ORIGIN").unwrap_or_else(|_| "http://localhost:3000".into());
     let app = router(state).layer(TraceLayer::new_for_http()).layer(
         CorsLayer::new()
-            .allow_origin(Any)
+            .allow_origin(cors_origin.parse::<axum::http::HeaderValue>()?)
             .allow_methods(Any)
-            .allow_headers(Any),
+            .allow_headers(Any)
+            .allow_credentials(true),
     );
 
     let addr: SocketAddr = format!("{host}:{port}").parse()?;
