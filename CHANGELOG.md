@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Phase 0 — free stack ADR & layout:** [`docs/adr/0001-free-stack.md`](./docs/adr/0001-free-stack.md) documents OSS-only choices (Postgres, SQLx, local disk imports, no paid auth/SaaS); [`docker-compose.yml`](./docker-compose.yml) for PostgreSQL 16; `data/imports/` for future CSV/NDJSON; `.env.example` with `DATABASE_URL`.
+- **Phase 1 — Postgres storage (`server/` / `customfolio-server`):** SQLx migrations for `users`, `accounts`, `portfolios` (JSONB `config`), `import_jobs`, `sessions`; repositories for create/list/get/upsert by `(account_id, slug)`; integration tests when `DATABASE_URL` is set.
 - `Makefile` and `scripts/check.sh` / `scripts/ensure-git-setup.sh` for one-command local validation aligned with CI (without requiring `cargo-llvm-cov` locally).
 - Expanded CLI unit and integration tests (`config`, `domain`, `scaffold`, `prompts`, `cli`, `cli_smoke`) for high coverage of domain presets, scaffolding, and flag parsing.
 - Template unit tests with Vitest (`template/lib/*.test.ts`) covering `utils`, `domains`, and `portfolio` helpers; `pnpm test` / `pnpm test:coverage` scripts.
