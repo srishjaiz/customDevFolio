@@ -23,3 +23,12 @@ template/tsconfig.tsbuildinfo
 template/coverage/
 /lcov.info
 /coverage/
+
+# Runtime uploads / NDJSON intermediates (Phase 0+)
+/data/imports/**
+!/data/imports/.gitkeep
+
+# Local env (DATABASE_URL, secrets)
+.env
+.env.*
+!.env.example
