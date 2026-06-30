@@ -2,7 +2,7 @@
 
 **Status:** Accepted  
 **Date:** 2026-06-30  
-**Phases:** 0–1 (foundation); informs later auth, import, and UI phases
+**Phases:** 0–7 implemented on branch `feature/multi-portfolio-builder` (`main` remains classic CLI-only)
 
 ## Context
 
@@ -19,11 +19,11 @@ We require **only freely available dependencies**: permissively licensed OSS tha
 | Layer | Choice | License (typical) | Notes |
 |--------|--------|-------------------|--------|
 | Database | **PostgreSQL** | PostgreSQL License | Source of truth for users, accounts, portfolios, jobs, sessions |
-| API / worker (future HTTP) | **Rust + Tokio + Axum** | MIT / Apache-2.0 | Same language as `cli/`; Phase 1 ships DB repos in `server/` |
+| API | **Rust + Tokio + Axum** (`customfolio-api`) | MIT / Apache-2.0 | Auth, accounts, portfolios, CSV upload |
 | DB access | **SQLx** | MIT / Apache-2.0 | Async Postgres; embedded SQL migrations |
 | Migrations | **SQLx `migrate!`** | (same) | Versioned SQL under `server/migrations/` |
 | Portfolio document | **JSONB** (`portfolios.config`) | — | Matches existing `PortfolioConfig` camelCase JSON |
-| Passwords (Phase 4) | **argon2** crate | MIT / Apache-2.0 | Not wired in Phase 1; column reserved on `users` |
+| Passwords (Phase 4) | **argon2** crate | MIT / Apache-2.0 | Used by `customfolio-api` signup/login |
 | Sessions (Phase 4) | **Postgres `sessions` table** + httpOnly cookies | — | Avoid Redis as a requirement |
 | CSV → NDJSON (Phase 2) | **`csv` + `serde_json`** crates | MIT / Apache-2.0 | Stream to disk; never load full CSV into RAM |
 | File uploads (Phase 5) | **Local disk** `data/imports/<job_id>/` | — | Gitignored; no S3 required |
