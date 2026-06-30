@@ -1,15 +1,18 @@
 mod cli;
 mod config;
+mod csv_ndjson;
 mod domain;
 mod prompts;
 mod scaffold;
+mod slug_util;
 
 use anyhow::{Context, Result};
 use clap::Parser;
 use console::style;
 
-use cli::{Cli, Commands, CreateArgs};
+use cli::{Cli, Commands, CreateArgs, CsvToNdjsonArgs};
 use config::{sanitize_project_name, DomainId, ThemeMode};
+use csv_ndjson::{csv_to_ndjson, ConvertOptions};
 use domain::CreateAnswers;
 use prompts::{apply_defaults, print_domains, run_wizard};
 use scaffold::{resolve_output_dir, scaffold, ScaffoldOptions};
@@ -29,7 +32,50 @@ fn run() -> Result<()> {
             Ok(())
         }
         Commands::Create(args) => cmd_create(*args),
+        Commands::CsvToNdjson(args) => cmd_csv_to_ndjson(args),
     }
+}
+
+fn cmd_csv_to_ndjson(args: CsvToNdjsonArgs) -> Result<()> {
+    println!(
+        "\n{} Streaming {} → {} …\n",
+        style("→").green().bold(),
+        style(args.input.display()).bold(),
+        style(args.output.display()).bold()
+    );
+
+    let stats = csv_to_ndjson(
+        &args.input,
+        &args.output,
+        &ConvertOptions {
+            include_sample_content: args.sample,
+            continue_on_error: args.continue_on_error,
+            errors_path: args.errors.clone(),
+        },
+    )
+    .with_context(|| {
+        format!(
+            "convert {} to {}",
+            args.input.display(),
+            args.output.display()
+        )
+    })?;
+
+    println!("{} Conversion complete", style("✓").green().bold());
+    println!();
+    println!("  rows:      {}", stats.total_rows);
+    println!("  succeeded: {}", stats.succeeded);
+    println!("  failed:    {}", stats.failed);
+    println!();
+    println!("  {}", style(args.output.display()).cyan());
+    if let Some(ref err) = args.errors {
+        if stats.failed > 0 {
+            println!("  errors: {}", style(err.display()).yellow());
+        }
+    }
+    println!();
+    println!("  NDJSON is an on-disk intermediate (Phase 2). Import into Postgres is Phase 3.");
+    Ok(())
 }
 
 fn cmd_create(args: CreateArgs) -> Result<()> {
