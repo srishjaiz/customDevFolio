@@ -32,3 +32,7 @@ template/coverage/
 .env
 .env.*
 !.env.example
+
+# Generated large import fixtures (create via scripts/generate_portfolio_csv.py)
+/examples/import/generated/**
+!/examples/import/generated/README.md
