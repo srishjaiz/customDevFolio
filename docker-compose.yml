@@ -1,0 +1,27 @@
+# Free / self-hosted dependencies for local development (Phase 0–1).
+# Usage:
+#   docker compose up -d postgres
+#   export DATABASE_URL=postgres://customfolio:customfolio@localhost:5432/customfolio
+#   cargo test -p customfolio-server
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: customfolio-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: customfolio
+      POSTGRES_PASSWORD: customfolio
+      POSTGRES_DB: customfolio
+    volumes:
+      - customfolio_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U customfolio -d customfolio"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  customfolio_pgdata:

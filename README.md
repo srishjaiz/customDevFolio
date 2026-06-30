@@ -17,6 +17,8 @@ Configure once via prompts or flags → scaffold a ready-to-run app → keep cus
 |-------|--------|----------|
 | **1 — Next template** | Done | [`template/`](./template/) |
 | **2–3 — Rust CLI** | Done | [`cli/`](./cli/) (`customfolio`) |
+| **Multi-account (free stack) Phase 0** | Done | [`docs/adr/0001-free-stack.md`](./docs/adr/0001-free-stack.md), [`docker-compose.yml`](./docker-compose.yml) |
+| **Multi-account Phase 1 — Postgres + repos** | Done | [`server/`](./server/) (`customfolio-server`) |
 | **Contributor workflow** | Done | PR template, commit hooks, changelog CI |
 | **Branch protection** | Active on `main` | Required CI checks (see below) |
 
@@ -125,21 +127,50 @@ Sections render only when **`sections.*` is true** and the related data is non-e
 
 Full template notes: [`template/README.md`](./template/README.md).
 
+## Multi-account foundation (Phases 0–1)
+
+Free / self-hosted stack only (no paid SaaS). Decision record: [`docs/adr/0001-free-stack.md`](./docs/adr/0001-free-stack.md).
+
+| Piece | Role |
+|-------|------|
+| **PostgreSQL** | Source of truth for users, accounts, portfolios (`config` JSONB), import jobs, sessions |
+| **`server/`** (`customfolio-server`) | SQLx migrations + repositories (HTTP API comes in later phases) |
+| **`docker-compose.yml`** | Local Postgres 16 |
+| **`data/imports/`** | Runtime CSV / NDJSON paths (gitignored; used from Phase 2+) |
+
+```bash
+# Start free Postgres
+docker compose up -d postgres
+
+export DATABASE_URL=postgres://customfolio:customfolio@localhost:5432/customfolio
+# or: cp .env.example .env
+
+cargo test -p customfolio-server
+# Integration tests exercise insert / list / get portfolio by (account_id, slug)
+```
+
+Offline **`customfolio create`** (single `portfolio.json` site) is unchanged. Multi-portfolio + auth + CSV import build on `server/` in later phases.
+
 ## Repository layout
 
 ```text
 customFolio/
-├── Cargo.toml                 # Rust workspace
+├── Cargo.toml                 # Rust workspace (cli + server)
 ├── Makefile                   # make check / setup / test / help (preferred DX)
 ├── CHANGELOG.md               # Keep a Changelog (required for feat/fix/perf PRs)
 ├── CONTRIBUTING.md            # Minimal contribute loop + CI expectations
 ├── README.md
+├── docker-compose.yml         # Free Postgres for local / CI-adjacent dev
+├── .env.example               # DATABASE_URL template
+├── docs/adr/                  # Architecture decision records
+├── data/imports/              # Gitignored upload / NDJSON intermediates
 ├── .gitmessage                # Commit template (auto-wired by make check)
 ├── .githooks/                 # Advisory commit-msg / pre-push tips (CI is the gate)
 ├── .github/
 │   ├── PULL_REQUEST_TEMPLATE.md
 │   └── workflows/ci.yml       # Rust + Next + Changelog jobs
 ├── cli/                       # customfolio binary (embeds template/)
+├── server/                    # customfolio-server: migrations + repos (Phase 1)
 ├── scripts/
 │   ├── check.sh               # Same as make check (no Make required)
 │   ├── ensure-git-setup.sh    # Idempotent commit.template + hooksPath
