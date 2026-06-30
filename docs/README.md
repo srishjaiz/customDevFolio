@@ -10,5 +10,5 @@
 
 **Branches**
 
-- `main` — classic single-portfolio CLI + template (stable baseline)
-- `feature/multi-portfolio-builder` — multi-account, Postgres, API, CSV import, dashboard UI
+- `main` — classic single-portfolio CLI + template (stable baseline, **protected**)
+- `feature/multi-portfolio-builder` — multi-account, Postgres, API, CSV import, dashboard UI (**protected**; open PRs into this branch for multi-portfolio work)
