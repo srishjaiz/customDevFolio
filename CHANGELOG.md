@@ -7,9 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **API boot / signup CORS:** session-cookie auth cannot use `Access-Control-Allow-Headers: *` with `Allow-Credentials: true` (tower-http panics; API never listens). CORS now lists methods/headers explicitly for cookie sessions.
+
 ### Added
 
 - **Portfolio looks:** sections render any `PortfolioConfig`. `templateId` selects Studio (current look) or Terminal (mono, denser, green). The same document feeds both. Empty sections stay hidden.
+- **CLI multi-portfolio + bulk CSV:** `customfolio multi` (signup, create-account, create-portfolio, list-*, import), `customfolio sample-csv` generator, and [`examples/import/sample_bulk.csv`](./examples/import/sample_bulk.csv) for testing.
+- **Next multi-portfolio under one account** (`feat/next-multi-portfolio-accounts`): dashboard to create accounts and many portfolios per account; `POST /accounts/{id}/portfolios` for manual create; CSV bulk import retained; auth options guide in [`docs/auth-options.md`](./docs/auth-options.md).
+
 
 ### Changed
 
@@ -17,6 +24,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Branch protection for `feature/multi-portfolio-builder` (PR + CI checks aligned with `main`); CI also runs on that branch.
+- Import test fixtures: `examples/import/edge_cases.csv` (breaking/edge rows) and `scripts/generate_portfolio_csv.py` for large mixed CSVs (e.g. 10k/100k).
+- End-to-end multi-portfolio docs: [`docs/multi-portfolio.md`](./docs/multi-portfolio.md), [`docs/README.md`](./docs/README.md); README reorganized for `main` vs `feature/multi-portfolio-builder` and how-to use.
+- **Phase 7 — Hardening / ops:** `Dockerfile.api`, compose `api` profile, `docs/ops.md` (env, upload limits, import cleanup), credentialed CORS via `CORS_ORIGIN`.
+- **Phase 6 — Browser UI:** Next.js `/login`, `/signup`, `/dashboard` with account list, CSV upload, and portfolio detail from API (`NEXT_PUBLIC_API_URL`).
+- **Phase 5 — Manual CSV upload:** authenticated `POST /accounts/{id}/imports` (multipart) writes CSV to disk, streams to NDJSON, imports to Postgres; `GET /imports/{job_id}` for status.
+- **Phase 4 — Auth API:** `customfolio-api` (Axum) with signup/login/logout/me (argon2 + httpOnly session cookies), create/list accounts, list/get portfolios for owners.
+- **Phase 3 — NDJSON → Postgres:** `customfolio import-db` always converts CSV→NDJSON on disk then streams NDJSON into portfolios (upsert by account+slug); `server` `import_ndjson_file` + import job updates.
+- **Phase 2 — CSV → NDJSON (streaming):** `customfolio csv-to-ndjson <csv> -o <ndjson>` streams large CSVs to on-disk NDJSON (one portfolio + `slug` per line) using free `csv` + `serde_json` crates—never loads the full file as one array. Flags: `--sample`, `--continue-on-error`, `--errors`. Example: [`examples/import/people.csv`](./examples/import/people.csv).
+- **Phase 0 — free stack ADR & layout:** [`docs/adr/0001-free-stack.md`](./docs/adr/0001-free-stack.md) documents OSS-only choices (Postgres, SQLx, local disk imports, no paid auth/SaaS); [`docker-compose.yml`](./docker-compose.yml) for PostgreSQL 16; `data/imports/` for future CSV/NDJSON; `.env.example` with `DATABASE_URL`.
+- **Phase 1 — Postgres storage (`server/` / `customfolio-server`):** SQLx migrations for `users`, `accounts`, `portfolios` (JSONB `config`), `import_jobs`, `sessions`; repositories for create/list/get/upsert by `(account_id, slug)`; integration tests when `DATABASE_URL` is set.
 - `Makefile` and `scripts/check.sh` / `scripts/ensure-git-setup.sh` for one-command local validation aligned with CI (without requiring `cargo-llvm-cov` locally).
 - Expanded CLI unit and integration tests (`config`, `domain`, `scaffold`, `prompts`, `cli`, `cli_smoke`) for high coverage of domain presets, scaffolding, and flag parsing.
 - Template unit tests with Vitest (`template/lib/*.test.ts`) covering `utils`, `domains`, and `portfolio` helpers; `pnpm test` / `pnpm test:coverage` scripts.

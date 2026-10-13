@@ -7,7 +7,12 @@ use crate::config::{DomainId, ThemeMode};
 #[derive(Debug, Parser)]
 #[command(
     name = "customfolio",
-    about = "Scaffold domain-aware Next.js developer portfolios",
+    about = "Scaffold single portfolios or manage multi-portfolio accounts (CSV bulk import)",
+    long_about = "customFolio CLI\n\n\
+Single portfolio:  customfolio create\n\
+Multi-portfolio:   customfolio multi signup | create-account | create-portfolio | import\n\
+CSV bulk:          customfolio sample-csv | csv-to-ndjson | multi import / import-db\n\
+Requires Postgres (DATABASE_URL) for multi/import commands.",
     version,
     propagate_version = true
 )]
@@ -22,6 +27,165 @@ pub enum Commands {
     Create(Box<CreateArgs>),
     /// List supported SWE domains and defaults
     Domains,
+    /// Stream a portfolio CSV to NDJSON on disk (large-file safe)
+    CsvToNdjson(CsvToNdjsonArgs),
+    /// Convert CSV→NDJSON on disk, then stream NDJSON into Postgres
+    ImportDb(ImportDbArgs),
+    /// Multi-portfolio account ops (signup, accounts, portfolios, CSV import)
+    Multi(MultiArgs),
+    /// Write a sample multi-portfolio CSV for testing bulk import
+    SampleCsv(SampleCsvArgs),
+}
+
+#[derive(Debug, clap::Args)]
+pub struct MultiArgs {
+    #[command(subcommand)]
+    pub command: MultiCommands,
+}
+
+#[derive(Debug, Subcommand)]
+pub enum MultiCommands {
+    /// Create a user (email + password) in Postgres — session cookies used by the API/UI
+    Signup(MultiSignupArgs),
+    /// Create an account that can own many portfolios
+    CreateAccount(MultiCreateAccountArgs),
+    /// Create one portfolio under an account
+    CreatePortfolio(MultiCreatePortfolioArgs),
+    /// List accounts owned by a user
+    ListAccounts(MultiListAccountsArgs),
+    /// List portfolios under an account
+    ListPortfolios(MultiListPortfoliosArgs),
+    /// Bulk import portfolios from CSV (CSV → NDJSON on disk → Postgres)
+    Import(ImportDbArgs),
+}
+
+#[derive(Debug, clap::Args)]
+pub struct MultiSignupArgs {
+    #[arg(long)]
+    pub email: String,
+    #[arg(long)]
+    pub password: String,
+    #[arg(long)]
+    pub display_name: Option<String>,
+    #[arg(long, env = "DATABASE_URL")]
+    pub database_url: String,
+}
+
+#[derive(Debug, clap::Args)]
+pub struct MultiCreateAccountArgs {
+    /// Owner user UUID (from `multi signup`)
+    #[arg(long)]
+    pub user_id: String,
+    /// Account display name (e.g. "Cohort 2026")
+    #[arg(long)]
+    pub name: String,
+    /// Optional URL slug (derived from name if omitted)
+    #[arg(long)]
+    pub slug: Option<String>,
+    #[arg(long)]
+    pub description: Option<String>,
+    #[arg(long, env = "DATABASE_URL")]
+    pub database_url: String,
+}
+
+#[derive(Debug, clap::Args)]
+pub struct MultiCreatePortfolioArgs {
+    #[arg(long)]
+    pub account_id: String,
+    #[arg(long)]
+    pub person_name: String,
+    #[arg(long)]
+    pub slug: Option<String>,
+    #[arg(long, default_value = "general")]
+    pub domain: String,
+    #[arg(long)]
+    pub title: Option<String>,
+    #[arg(long)]
+    pub bio: Option<String>,
+    #[arg(long, env = "DATABASE_URL")]
+    pub database_url: String,
+}
+
+#[derive(Debug, clap::Args)]
+pub struct MultiListAccountsArgs {
+    #[arg(long)]
+    pub user_id: String,
+    #[arg(long, env = "DATABASE_URL")]
+    pub database_url: String,
+}
+
+#[derive(Debug, clap::Args)]
+pub struct MultiListPortfoliosArgs {
+    #[arg(long)]
+    pub account_id: String,
+    #[arg(long, env = "DATABASE_URL")]
+    pub database_url: String,
+}
+
+#[derive(Debug, clap::Args)]
+pub struct SampleCsvArgs {
+    /// Output CSV path
+    #[arg(short = 'o', long, default_value = "examples/import/sample_bulk.csv")]
+    pub output: PathBuf,
+    /// Number of portfolio rows (demo people first, then synthetic)
+    #[arg(short = 'n', long, default_value_t = 12)]
+    pub count: usize,
+    /// Append a few invalid rows for error-path testing
+    #[arg(long)]
+    pub with_breaking: bool,
+}
+
+#[derive(Debug, clap::Args)]
+pub struct ImportDbArgs {
+    /// Portfolio CSV path (always converted to NDJSON on disk first)
+    #[arg(long)]
+    pub csv: PathBuf,
+
+    /// Account UUID that will own imported portfolios
+    #[arg(long)]
+    pub account_id: String,
+
+    /// User UUID recorded on the import job (must own or operate the account)
+    #[arg(long)]
+    pub user_id: String,
+
+    /// Postgres URL (or set DATABASE_URL)
+    #[arg(long, env = "DATABASE_URL")]
+    pub database_url: String,
+
+    /// Working directory for intermediate NDJSON / errors (default: data/imports/<job-id>)
+    #[arg(long)]
+    pub work_dir: Option<PathBuf>,
+
+    /// Include domain sample content when converting CSV
+    #[arg(long)]
+    pub sample: bool,
+
+    /// Continue after row errors
+    #[arg(long)]
+    pub continue_on_error: bool,
+}
+
+#[derive(Debug, clap::Args)]
+pub struct CsvToNdjsonArgs {
+    /// Input CSV path (header row required)
+    pub input: PathBuf,
+
+    /// Output NDJSON path (one portfolio JSON object per line)
+    #[arg(short = 'o', long)]
+    pub output: PathBuf,
+
+    /// Include domain sample experience/projects (default: minimal placeholders only)
+    #[arg(long)]
+    pub sample: bool,
+
+    /// Continue after row errors; write remaining good rows
+    #[arg(long)]
+    pub continue_on_error: bool,
+
+    /// Write per-row errors as NDJSON (`{"line", "error"}`)
+    #[arg(long)]
+    pub errors: Option<PathBuf>,
 }
 
 #[derive(Debug, Clone, Copy, ValueEnum)]
@@ -152,7 +316,13 @@ mod tests {
                 assert!(args.domain.is_none());
                 assert!(matches!(args.theme, ThemeModeArg::System));
             }
-            Commands::Domains => panic!("expected create"),
+            Commands::Domains
+            | Commands::CsvToNdjson(_)
+            | Commands::ImportDb(_)
+            | Commands::Multi(_)
+            | Commands::SampleCsv(_) => {
+                panic!("expected create")
+            }
         }
     }
 
@@ -221,7 +391,13 @@ mod tests {
                 assert!(args.git);
                 assert!(args.minimal);
             }
-            Commands::Domains => panic!("expected create"),
+            Commands::Domains
+            | Commands::CsvToNdjson(_)
+            | Commands::ImportDb(_)
+            | Commands::Multi(_)
+            | Commands::SampleCsv(_) => {
+                panic!("expected create")
+            }
         }
     }
 
@@ -229,6 +405,83 @@ mod tests {
     fn cli_parses_domains_subcommand() {
         let cli = Cli::try_parse_from(["customfolio", "domains"]).unwrap();
         assert!(matches!(cli.command, Commands::Domains));
+    }
+
+    #[test]
+    fn cli_parses_csv_to_ndjson() {
+        let cli = Cli::try_parse_from([
+            "customfolio",
+            "csv-to-ndjson",
+            "in.csv",
+            "-o",
+            "out.ndjson",
+            "--sample",
+            "--continue-on-error",
+            "--errors",
+            "err.ndjson",
+        ])
+        .unwrap();
+        match cli.command {
+            Commands::CsvToNdjson(args) => {
+                assert_eq!(args.input, PathBuf::from("in.csv"));
+                assert_eq!(args.output, PathBuf::from("out.ndjson"));
+                assert!(args.sample);
+                assert!(args.continue_on_error);
+                assert_eq!(
+                    args.errors.as_deref(),
+                    Some(std::path::Path::new("err.ndjson"))
+                );
+            }
+            _ => panic!("expected csv-to-ndjson"),
+        }
+    }
+
+    #[test]
+    fn cli_parses_multi_import_and_sample_csv() {
+        let cli = Cli::try_parse_from([
+            "customfolio",
+            "multi",
+            "import",
+            "--csv",
+            "people.csv",
+            "--account-id",
+            "00000000-0000-0000-0000-000000000001",
+            "--user-id",
+            "00000000-0000-0000-0000-000000000002",
+            "--database-url",
+            "postgres://u:p@localhost/db",
+            "--continue-on-error",
+        ])
+        .unwrap();
+        match cli.command {
+            Commands::Multi(m) => match m.command {
+                MultiCommands::Import(a) => {
+                    assert_eq!(a.csv, PathBuf::from("people.csv"));
+                    assert!(a.continue_on_error);
+                }
+                _ => panic!("expected multi import"),
+            },
+            _ => panic!("expected multi"),
+        }
+
+        let cli = Cli::try_parse_from([
+            "customfolio",
+            "sample-csv",
+            "-o",
+            "/tmp/s.csv",
+            "-n",
+            "25",
+            "--with-breaking",
+        ])
+        .unwrap();
+        match cli.command {
+            Commands::SampleCsv(a) => {
+                assert_eq!(a.output, PathBuf::from("/tmp/s.csv"));
+                assert_eq!(a.count, 25);
+                assert!(a.with_breaking);
+            }
+            _ => panic!("expected sample-csv"),
+        }
     }
 
     #[test]
