@@ -3,7 +3,7 @@
 use crate::config::{
     AchievementItem, BlogConfig, BlogPost, ContactInfo, DomainId, EducationItem, ExperienceItem,
     Greeting, PersonInfo, PortfolioConfig, PortfolioMeta, ProjectItem, SectionsConfig, SkillGroup,
-    SkillItem, SkillsSection, SocialLinks, ThemeConfig, ThemeMode,
+    SkillItem, SkillsSection, SocialLinks, TemplateId, ThemeConfig, ThemeMode,
 };
 
 pub struct DomainProfile {
@@ -374,6 +374,7 @@ impl CreateAnswers {
                 primary,
                 mode: self.theme_mode,
             },
+            template_id: TemplateId::Studio,
             sections: p.default_sections,
         }
     }

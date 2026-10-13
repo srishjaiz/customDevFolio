@@ -1,10 +1,10 @@
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Badge } from "@/components/ui/Badge";
-import { portfolio } from "@/lib/portfolio";
+import type { PortfolioConfig } from "@/lib/types";
 
-export function Skills() {
-  const { skills } = portfolio;
+export function Skills({ config }: { config: PortfolioConfig }) {
+  const { skills } = config;
   if (!skills.groups.length) return null;
 
   return (

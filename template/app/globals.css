@@ -61,3 +61,44 @@ body {
 .card-surface {
   @apply rounded-2xl border border-card-border bg-card shadow-sm;
 }
+
+/* Terminal shell: same sections, different type, density, and color. */
+[data-template="terminal"] {
+  --background: #f3f6f4;
+  --foreground: #10281c;
+  --muted: #3d5c4a;
+  --card: #ffffff;
+  --card-border: #c5d9cc;
+  --primary: #0f7a45;
+  --primary-foreground: #ffffff;
+  --section-alt: #e7f0ea;
+  --ring: color-mix(in srgb, var(--primary) 35%, transparent);
+  background: var(--background);
+  color: var(--foreground);
+  box-shadow: inset 0 3px 0 var(--primary);
+}
+
+.dark [data-template="terminal"] {
+  --background: #07110c;
+  --foreground: #d8ffe8;
+  --muted: #86a894;
+  --card: #0d1a13;
+  --card-border: #1d3a2c;
+  --primary: #3ddc97;
+  --primary-foreground: #042014;
+  --section-alt: #0c1812;
+}
+
+[data-template="terminal"] .section-pad {
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
+}
+
+[data-template="terminal"] .card-surface,
+[data-template="terminal"] .rounded-xl,
+[data-template="terminal"] .rounded-2xl,
+[data-template="terminal"] .rounded-3xl,
+[data-template="terminal"] .rounded-lg,
+[data-template="terminal"] .rounded-full {
+  border-radius: 0.2rem;
+}

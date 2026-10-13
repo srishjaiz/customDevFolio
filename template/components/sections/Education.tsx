@@ -1,10 +1,10 @@
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { portfolio } from "@/lib/portfolio";
+import type { PortfolioConfig } from "@/lib/types";
 import { formatDateRange } from "@/lib/utils";
 
-export function Education() {
-  const items = portfolio.education;
+export function Education({ config }: { config: PortfolioConfig }) {
+  const items = config.education;
   if (!items.length) return null;
 
   return (

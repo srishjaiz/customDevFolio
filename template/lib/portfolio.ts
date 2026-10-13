@@ -1,24 +1,32 @@
 import portfolioJson from "@/content/portfolio.json";
-import type { PortfolioConfig, SectionsConfig } from "./types";
+import type { PortfolioConfig, SectionsConfig, TemplateId } from "./types";
 import { getDomainProfile } from "./domains";
 
 /** Runtime portfolio loaded from generated/edited JSON. */
 export const portfolio = portfolioJson as PortfolioConfig;
 
+/** Studio when the document omits templateId or names anything other than terminal. */
+export function resolveTemplateId(config: PortfolioConfig): TemplateId {
+  return config.templateId === "terminal" ? "terminal" : "studio";
+}
+
 export function isSectionEnabled(
+  config: PortfolioConfig,
   key: keyof SectionsConfig,
   dataNonEmpty: boolean,
 ): boolean {
-  return portfolio.sections[key] === true && dataNonEmpty;
+  return config.sections[key] === true && dataNonEmpty;
 }
 
-export function domainLabel(): string {
-  return getDomainProfile(portfolio.domain).label;
+export function domainLabel(config: PortfolioConfig): string {
+  return getDomainProfile(config.domain).label;
 }
 
 /** Social entries with a defined URL, for rendering icons/links. */
-export function socialEntries(): { key: string; href: string; label: string }[] {
-  const s = portfolio.social;
+export function socialEntries(
+  config: PortfolioConfig,
+): { key: string; href: string; label: string }[] {
+  const s = config.social;
   const entries: { key: string; href: string; label: string }[] = [];
   const map: [keyof typeof s, string][] = [
     ["github", "GitHub"],

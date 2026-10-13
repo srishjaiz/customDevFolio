@@ -325,6 +325,15 @@ pub struct ThemeConfig {
     pub mode: ThemeMode,
 }
 
+/// Visual shell. Missing or unknown values deserialize as studio.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
+#[serde(rename_all = "lowercase")]
+pub enum TemplateId {
+    #[default]
+    Studio,
+    Terminal,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PortfolioMeta {
@@ -351,6 +360,8 @@ pub struct PortfolioConfig {
     pub blog: BlogConfig,
     pub contact: ContactInfo,
     pub theme: ThemeConfig,
+    #[serde(default)]
+    pub template_id: TemplateId,
     pub sections: SectionsConfig,
 }
 
@@ -516,6 +527,7 @@ mod tests {
                 primary: "#ec4899".into(),
                 mode: ThemeMode::Dark,
             },
+            template_id: TemplateId::Studio,
             sections: SectionsConfig {
                 skills: true,
                 experience: true,
@@ -536,7 +548,20 @@ mod tests {
         assert_eq!(back.domain, DomainId::Frontend);
         assert_eq!(back.person.name, "Ada");
         assert_eq!(back.theme.mode, ThemeMode::Dark);
+        assert_eq!(back.template_id, TemplateId::Studio);
+        assert!(json.contains("\"templateId\": \"studio\""));
         assert!(back.projects[0].featured);
+
+        let mut value: serde_json::Value = serde_json::from_str(json.trim()).unwrap();
+        value.as_object_mut().unwrap().remove("templateId");
+        let missing: PortfolioConfig = serde_json::from_value(value).unwrap();
+        assert_eq!(missing.template_id, TemplateId::Studio);
+
+        let terminal: PortfolioConfig = serde_json::from_str(
+            &json.replace("\"templateId\": \"studio\"", "\"templateId\": \"terminal\""),
+        )
+        .unwrap();
+        assert_eq!(terminal.template_id, TemplateId::Terminal);
     }
 
     #[test]

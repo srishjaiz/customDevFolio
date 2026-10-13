@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Portfolio looks:** sections render any `PortfolioConfig`. `templateId` selects Studio (current look) or Terminal (mono, denser, green). The same document feeds both. Empty sections stay hidden.
+
 ### Changed
 
 - **Contributor DX:** `make check` is the single local entrypoint (auto-configures commit template + hooks); git hooks are advisory only; CI remains the hard gate. Shorter `CONTRIBUTING.md` and PR template; no mandatory `./scripts/setup-git.sh` step.

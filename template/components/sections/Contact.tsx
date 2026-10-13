@@ -1,12 +1,13 @@
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ButtonLink } from "@/components/ui/ButtonLink";
-import { portfolio, socialEntries } from "@/lib/portfolio";
+import { socialEntries } from "@/lib/portfolio";
+import type { PortfolioConfig } from "@/lib/types";
 
-export function Contact() {
-  const { contact } = portfolio;
-  const email = contact.email ?? portfolio.social.email;
-  const socials = socialEntries().filter((s) => s.key !== "email");
+export function Contact({ config }: { config: PortfolioConfig }) {
+  const { contact } = config;
+  const email = contact.email ?? config.social.email;
+  const socials = socialEntries(config).filter((s) => s.key !== "email");
 
   return (
     <section

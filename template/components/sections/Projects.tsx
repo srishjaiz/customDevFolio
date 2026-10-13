@@ -1,10 +1,10 @@
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Badge } from "@/components/ui/Badge";
-import { portfolio } from "@/lib/portfolio";
+import type { PortfolioConfig } from "@/lib/types";
 
-export function Projects() {
-  const items = portfolio.projects;
+export function Projects({ config }: { config: PortfolioConfig }) {
+  const items = config.projects;
   if (!items.length) return null;
 
   const sorted = [...items].sort(

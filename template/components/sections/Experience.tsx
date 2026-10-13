@@ -1,11 +1,11 @@
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Badge } from "@/components/ui/Badge";
-import { portfolio } from "@/lib/portfolio";
+import type { PortfolioConfig } from "@/lib/types";
 import { formatDateRange } from "@/lib/utils";
 
-export function Experience() {
-  const items = portfolio.experience;
+export function Experience({ config }: { config: PortfolioConfig }) {
+  const items = config.experience;
   if (!items.length) return null;
 
   return (
