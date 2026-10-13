@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { Header } from "@/components/ui/Header";
-import { Footer } from "@/components/ui/Footer";
 import { ThemeScript } from "@/components/ui/ThemeScript";
 import { portfolio } from "@/lib/portfolio";
 import "./globals.css";
@@ -41,9 +39,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} min-h-screen antialiased`}
       >
-        <Header />
-        <main>{children}</main>
-        <Footer />
+        {children}
       </body>
     </html>
   );

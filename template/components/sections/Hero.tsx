@@ -1,19 +1,20 @@
 import { DomainBadge } from "@/components/ui/DomainBadge";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Container } from "@/components/ui/Container";
-import { portfolio, socialEntries } from "@/lib/portfolio";
+import { socialEntries } from "@/lib/portfolio";
+import type { PortfolioConfig } from "@/lib/types";
 import { initials } from "@/lib/utils";
 
-export function Hero() {
-  const { person, greeting } = portfolio;
-  const socials = socialEntries();
+export function Hero({ config }: { config: PortfolioConfig }) {
+  const { person, greeting } = config;
+  const socials = socialEntries(config);
 
   return (
     <section className="section-pad border-b border-card-border/60" id="top">
       <Container>
         <div className="flex flex-col gap-10 md:flex-row md:items-start md:justify-between">
           <div className="max-w-2xl space-y-6">
-            <DomainBadge />
+            <DomainBadge config={config} />
             <div className="space-y-3">
               <p className="text-sm font-medium text-primary">
                 {person.title}
@@ -42,7 +43,7 @@ export function Hero() {
                   Resume
                 </ButtonLink>
               ) : null}
-              {portfolio.sections.contact ? (
+              {config.sections.contact ? (
                 <ButtonLink href="#contact" variant="ghost">
                   Contact
                 </ButtonLink>

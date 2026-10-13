@@ -1,9 +1,9 @@
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { portfolio } from "@/lib/portfolio";
+import type { PortfolioConfig } from "@/lib/types";
 
-export function Achievements() {
-  const items = portfolio.achievements;
+export function Achievements({ config }: { config: PortfolioConfig }) {
+  const items = config.achievements;
   if (!items.length) return null;
 
   return (

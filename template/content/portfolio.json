@@ -173,6 +173,7 @@
     "primary": "#6366f1",
     "mode": "system"
   },
+  "templateId": "studio",
   "sections": {
     "skills": true,
     "experience": true,

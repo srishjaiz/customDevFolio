@@ -13,6 +13,9 @@ export type DomainId =
 
 export type ThemeMode = "system" | "light" | "dark";
 
+/** Visual shell. Sections stay the same; only type, density, and color change. */
+export type TemplateId = "studio" | "terminal";
+
 export interface SectionsConfig {
   skills: boolean;
   experience: boolean;
@@ -162,5 +165,10 @@ export interface PortfolioConfig {
   blog: BlogConfig;
   contact: ContactInfo;
   theme: ThemeConfig;
+  /**
+   * Look applied by the shell. Omitted documents render as studio.
+   * Does not change section content.
+   */
+  templateId?: TemplateId;
   sections: SectionsConfig;
 }

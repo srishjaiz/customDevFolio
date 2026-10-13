@@ -1,10 +1,10 @@
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ButtonLink } from "@/components/ui/ButtonLink";
-import { portfolio } from "@/lib/portfolio";
+import type { PortfolioConfig } from "@/lib/types";
 
-export function Blog() {
-  const blog = portfolio.blog;
+export function Blog({ config }: { config: PortfolioConfig }) {
+  const blog = config.blog;
   if (!blog.enabled) return null;
   const posts = blog.posts ?? [];
   if (!posts.length && !blog.url) return null;

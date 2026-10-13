@@ -45,21 +45,39 @@ describe("portfolio helpers", () => {
   });
 
   it("domainLabel uses domain profile", async () => {
-    const { domainLabel } = await import("./portfolio");
-    expect(domainLabel()).toBe("Full-Stack Engineer");
+    const { domainLabel, portfolio } = await import("./portfolio");
+    expect(domainLabel(portfolio)).toBe("Full-Stack Engineer");
   });
 
-  it("isSectionEnabled requires flag and data", async () => {
-    const { isSectionEnabled } = await import("./portfolio");
-    expect(isSectionEnabled("experience", true)).toBe(true);
-    expect(isSectionEnabled("experience", false)).toBe(false);
-    expect(isSectionEnabled("achievements", true)).toBe(false);
-    expect(isSectionEnabled("blog", false)).toBe(false);
+  it("isSectionEnabled requires flag and data on the given document", async () => {
+    const { isSectionEnabled, portfolio } = await import("./portfolio");
+    expect(isSectionEnabled(portfolio, "experience", true)).toBe(true);
+    expect(isSectionEnabled(portfolio, "experience", false)).toBe(false);
+    expect(isSectionEnabled(portfolio, "achievements", true)).toBe(false);
+    expect(isSectionEnabled(portfolio, "blog", false)).toBe(false);
+
+    const other = {
+      ...portfolio,
+      sections: { ...portfolio.sections, experience: false, achievements: true },
+    };
+    expect(isSectionEnabled(other, "experience", true)).toBe(false);
+    expect(isSectionEnabled(other, "achievements", true)).toBe(true);
+  });
+
+  it("resolveTemplateId defaults to studio and accepts terminal", async () => {
+    const { portfolio, resolveTemplateId } = await import("./portfolio");
+    expect(resolveTemplateId(portfolio)).toBe("studio");
+    expect(resolveTemplateId({ ...portfolio, templateId: "studio" })).toBe(
+      "studio",
+    );
+    expect(resolveTemplateId({ ...portfolio, templateId: "terminal" })).toBe(
+      "terminal",
+    );
   });
 
   it("socialEntries maps known links and extras", async () => {
-    const { socialEntries } = await import("./portfolio");
-    const entries = socialEntries();
+    const { socialEntries, portfolio } = await import("./portfolio");
+    const entries = socialEntries(portfolio);
     const keys = entries.map((e) => e.key);
     expect(keys).toContain("github");
     expect(keys).toContain("linkedin");
@@ -101,8 +119,8 @@ describe("portfolio helpers", () => {
       },
     }));
     vi.resetModules();
-    const { socialEntries } = await import("./portfolio");
-    const email = socialEntries().find((e) => e.key === "email");
+    const { socialEntries, portfolio } = await import("./portfolio");
+    const email = socialEntries(portfolio).find((e) => e.key === "email");
     expect(email?.href).toBe("mailto:direct@example.com");
   });
 });
